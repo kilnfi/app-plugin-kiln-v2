@@ -61,6 +61,7 @@ nano_models.forEach(function (model) {
       ]);
 
       await tx;
-    })
+    }),
+    10000
   );
 });
