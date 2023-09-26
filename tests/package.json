@@ -6,7 +6,8 @@
   "scripts": {
     "build": "babel src/ -d lib/",
     "prepublish": "yarn run build",
-    "test": "jest src --verbose --runInBand --detectOpenHandles"
+    "test": "jest src --verbose --runInBand --detectOpenHandles",
+    "test:one": "jest $TEST --verbose --runInBand --detectOpenHandles"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +16,7 @@
     "@ledgerhq/hw-app-eth": "^6.27.1",
     "@ledgerhq/hw-transport-http": "^6.15.0",
     "@ledgerhq/logs": "^6.2.0",
-    "@zondax/zemu": "^0.35.1",
+    "@zondax/zemu": "^0.44.2",
     "bip32-path": "^0.4.2",
     "core-js": "^3.16.3",
     "ethereum-tx-decoder": "^3.0.0",
