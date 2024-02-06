@@ -78,7 +78,7 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
                                      sizeof(address_buffer),
                                      msg->pluginSharedRW->sha3,
                                      0);
-            context->param_data.lr_deposit.lr_strategy_to_display =
+            context->param_data.lr_deposit.strategy_to_display =
                 find_lr_known_strategy(address_buffer, context);
 
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_TOKEN;
@@ -90,15 +90,15 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
                                      sizeof(address_buffer),
                                      msg->pluginSharedRW->sha3,
                                      0);
-            context->param_data.lr_deposit.lr_erc20_to_display =
+            context->param_data.lr_deposit.erc20_to_display =
                 find_lr_known_erc20(address_buffer, context);
 
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_AMOUNT;
             break;
         case LR_DEPOSIT_INTO_STRATEGY_AMOUNT:
-            copy_parameter(context->param_data.lr_deposit.lr_erc20_amount_to_display,
+            copy_parameter(context->param_data.lr_deposit.erc20_amount_to_display,
                            msg->parameter,
-                           sizeof(context->param_data.lr_deposit.lr_erc20_amount_to_display));
+                           sizeof(context->param_data.lr_deposit.erc20_amount_to_display));
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_UNEXPECTED_PARAMETER;
             break;
         default:
@@ -109,6 +109,8 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
 }
 
 void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *context) {
+    uint8_t buffer[ADDRESS_LENGTH];
+
     switch (context->next_param) {
         case LR_QUEUE_WITHDRAWAL_STRATEGY_INDEXES_OFFSET:
             context->next_param = LR_QUEUE_WITHDRAWAL_STRATEGIES_OFFSET;

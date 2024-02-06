@@ -103,9 +103,9 @@ extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
 #define MAX_DISPLAY_COUNT 3
 
 typedef struct {
-    int lr_strategy_to_display;
-    int lr_erc20_to_display;
-    uint8_t lr_erc20_amount_to_display[INT256_LENGTH];
+    int strategy_to_display;
+    int erc20_to_display;
+    uint8_t erc20_amount_to_display[INT256_LENGTH];
 } lr_deposit_t;
 
 typedef struct {

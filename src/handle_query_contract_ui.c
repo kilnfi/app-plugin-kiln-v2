@@ -180,23 +180,22 @@ static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *con
     switch (msg->screenIndex) {
         case 0:
             strlcpy(msg->title, "Strategy", msg->titleLength);
-            if (params->lr_strategy_to_display == -1) {
+            if (params->strategy_to_display == -1) {
                 strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
             } else {
-                strlcpy(msg->msg, lr_tickers[params->lr_strategy_to_display], MAX_TICKER_LEN);
+                strlcpy(msg->msg, lr_tickers[params->strategy_to_display], MAX_TICKER_LEN);
             }
             ret = true;
             break;
         case 1:
             strlcpy(msg->title, "Amount", msg->titleLength);
-            amountToString(params->lr_erc20_amount_to_display,
-                           sizeof(params->lr_erc20_amount_to_display),
-                           ERC20_DECIMALS,
-                           params->lr_erc20_to_display == -1
-                               ? "UNKNOWN"
-                               : lr_tickers[params->lr_erc20_to_display],
-                           msg->msg,
-                           msg->msgLength);
+            amountToString(
+                params->erc20_amount_to_display,
+                sizeof(params->erc20_amount_to_display),
+                ERC20_DECIMALS,
+                params->erc20_to_display == -1 ? "UNKNOWN" : lr_tickers[params->erc20_to_display],
+                msg->msg,
+                msg->msgLength);
             ret = true;
             break;
         default:
