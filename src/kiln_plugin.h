@@ -101,6 +101,7 @@ extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
 
 // max number of strategies / erc20 to display
 #define MAX_DISPLAY_COUNT 3
+#define SELECTOR_LENGTH   4
 
 typedef struct {
     int strategy_to_display;
@@ -109,6 +110,8 @@ typedef struct {
 } lr_deposit_t;
 
 typedef struct {
+    uint16_t skip_offset;
+    bool go_to_offset;
     char withdrawer[ADDRESS_STR_LEN];
 } lr_queue_withdrawal_t;
 

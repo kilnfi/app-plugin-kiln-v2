@@ -99,21 +99,68 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
         default:
             PRINTF("Param not supported: %d\n", context->next_param);
             msg->result = ETH_PLUGIN_RESULT_ERROR;
-            break;
+            return;
     }
+    msg->result = ETH_PLUGIN_RESULT_OK;
 }
 
 void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *context) {
+    // example for queue withdrawal with 2 strategies indexes, contracts and shares
+    // 0 selector
+    // 4 strat_i_offset -- starting here
+    // 36 strat_offset
+    // 68 shares_offset
+    // 100 withdrawal
+    // 132 undelegateIfPossible
+    // 164 strat_i_length
+    // 196 strat_i[0]
+    // 228 strat_i[1]
+    // 260 strat_length
+    // 292 strat[0]
+    // 324 strat[1]
+    // 356 shares_length
+    // 388 shares[0]
+    // 420 shares[1]
+
     uint8_t buffer[ADDRESS_LENGTH];
+    lr_queue_withdrawal_t *params = &context->param_data.lr_queue_withdrawal;
+
+    if (params->skip_offset != 0 && params->go_to_offset == false &&
+        msg->parameterOffset == params->skip_offset + SELECTOR_LENGTH) {
+        // if we reach offset, we get the size of the array and skip parsing it
+        // in the condition of the default switch case
+
+        // with the example above:
+        // before:
+        // 356 shares_length -- skip_offset
+        // 388 shares[0]
+        // 420 shares[1]
+        params->skip_offset +=
+            U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset)) * PARAMETER_LENGTH;
+        // after:
+        // 356 shares_length
+        // 388 shares[0]
+        // 420 shares[1] -- skip_offset
+        params->go_to_offset = true;
+    }
 
     switch (context->next_param) {
         case LR_QUEUE_WITHDRAWAL_STRATEGY_INDEXES_OFFSET:
+            params->go_to_offset = false;
             context->next_param = LR_QUEUE_WITHDRAWAL_STRATEGIES_OFFSET;
             break;
         case LR_QUEUE_WITHDRAWAL_STRATEGIES_OFFSET:
             context->next_param = LR_QUEUE_WITHDRAWAL_SHARES_OFFSET;
             break;
         case LR_QUEUE_WITHDRAWAL_SHARES_OFFSET:
+            // before:
+            // skip_offset = 0
+            params->skip_offset =
+                U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset));
+            // after:
+            // 356 shares_length -- skip_offset
+            // 388 shares[0]
+            // 420 shares[1]
             context->next_param = LR_QUEUE_WITHDRAWAL_WITHDRAWER;
             break;
         case LR_QUEUE_WITHDRAWAL_WITHDRAWER:
@@ -129,9 +176,15 @@ void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *con
             context->next_param = LR_QUEUE_WITHDRAWAL_UNEXPECTED_PARAMETER;
             break;
         default:
+            if (msg->parameterOffset <= params->skip_offset + SELECTOR_LENGTH) {
+                // as we don't want to display the strategy indexes, strategies and shares amount
+                // we skip parsing them until skip_offset is reached
+                msg->result = ETH_PLUGIN_RESULT_OK;
+                return;
+            }
             PRINTF("Param not supported: %d\n", context->next_param);
-            // msg->result = ETH_PLUGIN_RESULT_ERROR;
-            break;
+            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            return;
     }
     msg->result = ETH_PLUGIN_RESULT_OK;
 }
@@ -153,7 +206,7 @@ void handle_lr_complete_queued_withdrawal(ethPluginProvideParameter_t *msg, cont
         default:
             PRINTF("Param not supported: %d\n", context->next_param);
             // msg->result = ETH_PLUGIN_RESULT_ERROR;
-            break;
+            return;
     }
     msg->result = ETH_PLUGIN_RESULT_OK;
 }
@@ -197,15 +250,12 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
 
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
             handle_lr_deposit_into_strategy(msg, context);
-            msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         case KILN_LR_QUEUE_WITHDRAWAL:
             handle_lr_queue_withdrawal(msg, context);
-            msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
             handle_lr_complete_queued_withdrawal(msg, context);
-            msg->result = ETH_PLUGIN_RESULT_OK;
             break;
 
         default:
