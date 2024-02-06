@@ -9,7 +9,7 @@
  *
  * @return true if the addresses are the same
  */
-bool compare_addresses(const char *a, const char *b) {
+bool compare_addresses(const char a[ADDRESS_STR_LEN], const char b[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < ADDRESS_STR_LEN; i += 1) {
         if (tolower((unsigned char) a[i]) != tolower((unsigned char) b[i])) {
             return false;
@@ -26,7 +26,7 @@ bool compare_addresses(const char *a, const char *b) {
  *
  * @returns index of the erc20 in the context or -1 if not found
  */
-int find_lr_known_erc20(const char *address) {
+int find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_erc20_addresses[i])) {
             return i;
@@ -44,7 +44,7 @@ int find_lr_known_erc20(const char *address) {
  *
  * @returns index of the strategy in the context or -1 if not found
  */
-int find_lr_known_strategy(const char *address) {
+int find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_strategy_addresses[i])) {
             return i;
