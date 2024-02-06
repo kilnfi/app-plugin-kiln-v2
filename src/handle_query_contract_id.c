@@ -45,7 +45,7 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
             break;
 
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
-            strlcpy(msg->version, "Deposit In Strategy", msg->versionLength);
+            strlcpy(msg->version, "Liquid Restaking", msg->versionLength);
             break;
 
         case KILN_LR_QUEUE_WITHDRAWAL:

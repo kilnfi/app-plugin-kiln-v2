@@ -113,9 +113,6 @@ typedef struct {
 } lr_queue_withdrawal_t;
 
 typedef struct {
-    // int lr_strategy_to_display[MAX_DISPLAY_COUNT];
-    // int lr_erc20_to_display[MAX_DISPLAY_COUNT];
-    // uint8_t lr_erc20_amount_to_display[MAX_DISPLAY_COUNT][INT256_LENGTH];
 } lr_complete_queued_withdrawal_t;
 
 typedef struct context_t {

@@ -22,7 +22,7 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
-            msg->numScreens = 2;
+            msg->numScreens = 3;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         case KILN_LR_QUEUE_WITHDRAWAL:

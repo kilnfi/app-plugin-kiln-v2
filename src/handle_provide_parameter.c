@@ -23,12 +23,10 @@ bool compare_addresses(const char *a, const char *b) {
  * otherwise set it to unkwown (-1)
  *
  * @param address: address to compare
- * @param index: index of the erc20 in the context
- * @param context: context to update
  *
  * @returns index of the erc20 in the context or -1 if not found
  */
-int find_lr_known_erc20(const char *address, context_t *context) {
+int find_lr_known_erc20(const char *address) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_erc20_addresses[i])) {
             return i;
@@ -43,12 +41,10 @@ int find_lr_known_erc20(const char *address, context_t *context) {
  * otherwise set it to unkwown (-1)
  *
  * @param address: address to compare
- * @param index: index of the strategy in the context
- * @param context: context to update
  *
  * @returns index of the strategy in the context or -1 if not found
  */
-int find_lr_known_strategy(const char *address, context_t *context) {
+int find_lr_known_strategy(const char *address) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_strategy_addresses[i])) {
             return i;
@@ -79,7 +75,7 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
                                      msg->pluginSharedRW->sha3,
                                      0);
             context->param_data.lr_deposit.strategy_to_display =
-                find_lr_known_strategy(address_buffer, context);
+                find_lr_known_strategy(address_buffer);
 
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_TOKEN;
             break;
@@ -90,8 +86,7 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
                                      sizeof(address_buffer),
                                      msg->pluginSharedRW->sha3,
                                      0);
-            context->param_data.lr_deposit.erc20_to_display =
-                find_lr_known_erc20(address_buffer, context);
+            context->param_data.lr_deposit.erc20_to_display = find_lr_known_erc20(address_buffer);
 
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_AMOUNT;
             break;

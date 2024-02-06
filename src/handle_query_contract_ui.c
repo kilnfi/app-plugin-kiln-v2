@@ -179,6 +179,11 @@ static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *con
 
     switch (msg->screenIndex) {
         case 0:
+            strlcpy(msg->title, "EigenLayer", msg->titleLength);
+            strlcpy(msg->msg, "Deposit In Strategy", msg->msgLength);
+            ret = true;
+            break;
+        case 1:
             strlcpy(msg->title, "Strategy", msg->titleLength);
             if (params->strategy_to_display == -1) {
                 strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
@@ -187,7 +192,7 @@ static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *con
             }
             ret = true;
             break;
-        case 1:
+        case 2:
             strlcpy(msg->title, "Amount", msg->titleLength);
             amountToString(
                 params->erc20_amount_to_display,

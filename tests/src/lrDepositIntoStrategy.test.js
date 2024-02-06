@@ -18,7 +18,7 @@ const contractAddr = '0x858646372cc42e1a627fce94aa7a7033e7cf075a'; // strategy m
 const pluginName = 'Kiln';
 const abi_path = `../cal/abis/${contractAddr}.json`;
 const abi = require(abi_path);
-const right_clicks = 5;
+const right_clicks = 6;
 
 nano_models.forEach(function (model) {
   test(

@@ -53,7 +53,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = 4;
+      const right_clicks = 7;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
