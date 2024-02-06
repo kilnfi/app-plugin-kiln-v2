@@ -26,7 +26,7 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         case KILN_LR_QUEUE_WITHDRAWAL:
-            msg->numScreens = 1;
+            msg->numScreens = 2;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:

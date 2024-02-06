@@ -205,14 +205,21 @@ static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *con
     return ret;
 }
 
-static bool queue_withdrawal_ui_lr(ethQueryContractUI_t *msg) {
+static bool queue_withdrawal_ui_lr(ethQueryContractUI_t *msg, context_t *context) {
     // TODO: display strategies
     bool ret = false;
+    lr_queue_withdrawal_t *params = &context->param_data.lr_queue_withdrawal;
 
     switch (msg->screenIndex) {
         case 0:
             strlcpy(msg->title, "EigenLayer", msg->titleLength);
             strlcpy(msg->msg, "Queue Withdrawal", msg->msgLength);
+            ret = true;
+            break;
+
+        case 1:
+            strlcpy(msg->title, "Withdrawer", msg->titleLength);
+            strlcpy(msg->msg, params->withdrawer, msg->msgLength);
             ret = true;
             break;
 
@@ -290,7 +297,7 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
             break;
 
         case KILN_LR_QUEUE_WITHDRAWAL:
-            ret = queue_withdrawal_ui_lr(msg);
+            ret = queue_withdrawal_ui_lr(msg, context);
             break;
 
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:

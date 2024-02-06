@@ -122,6 +122,12 @@ void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *con
             context->next_param = LR_QUEUE_WITHDRAWAL_WITHDRAWER;
             break;
         case LR_QUEUE_WITHDRAWAL_WITHDRAWER:
+            copy_address(buffer, msg->parameter, sizeof(buffer));
+            getEthDisplayableAddress(buffer,
+                                     context->param_data.lr_queue_withdrawal.withdrawer,
+                                     sizeof(context->param_data.lr_queue_withdrawal.withdrawer),
+                                     msg->pluginSharedRW->sha3,
+                                     0);
             context->next_param = LR_QUEUE_WITHDRAWAL_UNDELEGATEIFPOSSIBLE;
             break;
         case LR_QUEUE_WITHDRAWAL_UNDELEGATEIFPOSSIBLE:
