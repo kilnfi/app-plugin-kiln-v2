@@ -105,22 +105,23 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
 }
 
 void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *context) {
+    // queueWithdrawal(uint256[],address[],uint256[],address,bool
     // example for queue withdrawal with 2 strategies indexes, contracts and shares
-    // 0 selector
-    // 4 strat_i_offset -- starting here
-    // 36 strat_offset
-    // 68 shares_offset
-    // 100 withdrawal
-    // 132 undelegateIfPossible
-    // 164 strat_i_length
-    // 196 strat_i[0]
-    // 228 strat_i[1]
-    // 260 strat_length
-    // 292 strat[0]
-    // 324 strat[1]
-    // 356 shares_length
-    // 388 shares[0]
-    // 420 shares[1]
+    // [0] selector
+    // [4] strat_i_offset -- starting here
+    // [36] strat_offset
+    // [68] shares_offset
+    // [100] withdrawal
+    // [132] undelegateIfPossible
+    // [164] strat_i_length
+    // [196] strat_i[0]
+    // [228] strat_i[1]
+    // [260] strat_length
+    // [292] strat[0]
+    // [324] strat[1]
+    // [356] shares_length
+    // [388] shares[0]
+    // [420] shares[1]
 
     uint8_t buffer[ADDRESS_LENGTH];
     lr_queue_withdrawal_t *params = &context->param_data.lr_queue_withdrawal;
@@ -132,15 +133,15 @@ void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *con
 
         // with the example above:
         // before:
-        // 356 shares_length -- skip_offset
-        // 388 shares[0]
-        // 420 shares[1]
+        // [356] shares_length -- skip_offset
+        // [388] shares[0]
+        // [420] shares[1]
         params->skip_offset +=
             U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset)) * PARAMETER_LENGTH;
         // after:
-        // 356 shares_length
-        // 388 shares[0]
-        // 420 shares[1] -- skip_offset
+        // [356] shares_length
+        // [388] shares[0]
+        // [420] shares[1] -- skip_offset
         params->go_to_offset = true;
     }
 
@@ -158,9 +159,9 @@ void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *con
             params->skip_offset =
                 U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset));
             // after:
-            // 356 shares_length -- skip_offset
-            // 388 shares[0]
-            // 420 shares[1]
+            // [356] shares_length -- skip_offset
+            // [388] shares[0]
+            // [420] shares[1]
             context->next_param = LR_QUEUE_WITHDRAWAL_WITHDRAWER;
             break;
         case LR_QUEUE_WITHDRAWAL_WITHDRAWER:
@@ -190,11 +191,56 @@ void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *con
 }
 
 void handle_lr_complete_queued_withdrawal(ethPluginProvideParameter_t *msg, context_t *context) {
+    // completeQueuedWithdrawal((address[],uint256[],address,(address,uint96),uint32,address),address[],uint256,bool)
+    // example for complete queued withdrawal with 2 tokens
+    // [0] selector
+    // [4] queuedWithdrawal_offset -- starting here
+    // [36] withdrawal_struct_offset
+    // [68] token_list_offset
+    // [100] middleware_time_index
+    // [132] receive_as_tokens
+    // [164] withdrawal_struct_offset_length
+    // [...] withdrawal_struct elements
+    // [...] withdrawal_struct elements
+    // [164 + nb_struct_elem * 32] token_list_length
+    // [...] token_list elements
+    // [...] token_list elements
+
+    lr_complete_queued_withdrawal_t *params = &context->param_data.lr_complete_queued_withdrawal;
+
+    if (params->skip_offset != 0 && params->go_to_offset == false &&
+        msg->parameterOffset == params->skip_offset + SELECTOR_LENGTH) {
+        // if we reach offset, we get the size of the array and skip parsing it
+        // in the condition of the default switch case
+
+        // with the example above:
+        // before:
+        // [164 + nb_struct_elem * 32] token_list_length -- skip_offset
+        // [...] token_list elements
+        // [...] token_list elements
+        params->skip_offset +=
+            U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset)) * PARAMETER_LENGTH;
+        // after:
+        // [164 + nb_struct_elem * 32] token_list_length
+        // [...] token_list elements
+        // [...] token_list elements -- skip_offset
+
+        params->go_to_offset = true;
+    }
+
     switch (context->next_param) {
         case LR_COMPLETE_QUEUED_WITHDRAWAL_QUEUEDWITHDRAWAL_OFFSET:
             context->next_param = LR_COMPLETE_QUEUED_WITHDRAWAL_TOKENS_OFFSET;
             break;
         case LR_COMPLETE_QUEUED_WITHDRAWAL_TOKENS_OFFSET:
+            // before:
+            // skip_offset = 0
+            params->skip_offset =
+                U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset));
+            // after:
+            // [164 + nb_struct_elem * 32] token_list_length -- skip_offset
+            // [...] token_list elements
+            // [...] token_list elements
             context->next_param = LR_COMPLETE_QUEUED_WITHDRAWAL_MIDDLEWARETIMEINDEX;
             break;
         case LR_COMPLETE_QUEUED_WITHDRAWAL_MIDDLEWARETIMEINDEX:
@@ -204,8 +250,14 @@ void handle_lr_complete_queued_withdrawal(ethPluginProvideParameter_t *msg, cont
             context->next_param = LR_COMPLETE_QUEUED_WITHDRAWAL_UNEXPECTED_PARAMETER;
             break;
         default:
+            if (msg->parameterOffset <= params->skip_offset + SELECTOR_LENGTH) {
+                // as we don't want to display withdrawals structures
+                // we skip parsing them until skip_offset is reached
+                msg->result = ETH_PLUGIN_RESULT_OK;
+                return;
+            }
             PRINTF("Param not supported: %d\n", context->next_param);
-            // msg->result = ETH_PLUGIN_RESULT_ERROR;
+            msg->result = ETH_PLUGIN_RESULT_ERROR;
             return;
     }
     msg->result = ETH_PLUGIN_RESULT_OK;

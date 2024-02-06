@@ -116,6 +116,8 @@ typedef struct {
 } lr_queue_withdrawal_t;
 
 typedef struct {
+    uint16_t skip_offset;
+    bool go_to_offset;
 } lr_complete_queued_withdrawal_t;
 
 typedef struct context_t {
