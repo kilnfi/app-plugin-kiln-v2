@@ -58,7 +58,6 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
             break;
 
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
-            context->lr_display_buffer_size = 1;
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_STRATEGY;
             break;
         case KILN_LR_QUEUE_WITHDRAWAL:

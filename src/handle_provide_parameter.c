@@ -26,18 +26,16 @@ bool compare_addresses(const char *a, const char *b) {
  * @param index: index of the erc20 in the context
  * @param context: context to update
  *
- * @note impacts the following context storage:
- * `context->lr_strategy_to_display`: set index of the erc20 in the context
+ * @returns index of the erc20 in the context or -1 if not found
  */
-void find_lr_known_erc20(const char *address, size_t index, context_t *context) {
+int find_lr_known_erc20(const char *address, context_t *context) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_erc20_addresses[i])) {
-            context->lr_erc20_to_display[index] = i;
-            return;
+            return i;
         }
     }
     // if unknown erc20, indicate it
-    context->lr_erc20_to_display[index] = -1;
+    return -1;
 }
 
 /*
@@ -48,18 +46,16 @@ void find_lr_known_erc20(const char *address, size_t index, context_t *context) 
  * @param index: index of the strategy in the context
  * @param context: context to update
  *
- * @note impacts the following context storage:
- *  `context->lr_strategy_to_display`: set index of the strategy in the context
+ * @returns index of the strategy in the context or -1 if not found
  */
-void find_lr_known_strategy(const char *address, size_t index, context_t *context) {
+int find_lr_known_strategy(const char *address, context_t *context) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_strategy_addresses[i])) {
-            context->lr_strategy_to_display[index] = i;
-            return;
+            return i;
         }
     }
     // if unknown strategy, indicate it
-    context->lr_strategy_to_display[index] = -1;
+    return -1;
 }
 
 /*
@@ -68,12 +64,6 @@ void find_lr_known_strategy(const char *address, size_t index, context_t *contex
  *
  * @param msg: message containing the parameter
  * @param context: context to update
- *
- * @note impacts the following context storage:
- *   `context->next_param`: set to the next parameter to handle
- *   `context->lr_strategy_to_display`: set index of the strategy in the context
- *   `context->lr_erc20_to_display`: set index of the erc20 in the context
- *   `context->lr_erc20_amount_to_display`: set amount of the erc20 in the context
  *
  */
 void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t *context) {
@@ -88,7 +78,8 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
                                      sizeof(address_buffer),
                                      msg->pluginSharedRW->sha3,
                                      0);
-            find_lr_known_strategy(address_buffer, 0, context);
+            context->param_data.lr_deposit.lr_strategy_to_display =
+                find_lr_known_strategy(address_buffer, context);
 
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_TOKEN;
             break;
@@ -99,14 +90,15 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
                                      sizeof(address_buffer),
                                      msg->pluginSharedRW->sha3,
                                      0);
-            find_lr_known_erc20(address_buffer, 0, context);
+            context->param_data.lr_deposit.lr_erc20_to_display =
+                find_lr_known_erc20(address_buffer, context);
 
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_AMOUNT;
             break;
         case LR_DEPOSIT_INTO_STRATEGY_AMOUNT:
-            copy_parameter(context->lr_erc20_amount_to_display[0],
+            copy_parameter(context->param_data.lr_deposit.lr_erc20_amount_to_display,
                            msg->parameter,
-                           sizeof(context->lr_erc20_amount_to_display[0]));
+                           sizeof(context->param_data.lr_deposit.lr_erc20_amount_to_display));
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_UNEXPECTED_PARAMETER;
             break;
         default:

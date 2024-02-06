@@ -102,14 +102,30 @@ extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
 // max number of strategies / erc20 to display
 #define MAX_DISPLAY_COUNT 3
 
+typedef struct {
+    int lr_strategy_to_display;
+    int lr_erc20_to_display;
+    uint8_t lr_erc20_amount_to_display[INT256_LENGTH];
+} lr_deposit_t;
+
+typedef struct {
+    char withdrawer[ADDRESS_STR_LEN];
+} lr_queue_withdrawal_t;
+
+typedef struct {
+    // int lr_strategy_to_display[MAX_DISPLAY_COUNT];
+    // int lr_erc20_to_display[MAX_DISPLAY_COUNT];
+    // uint8_t lr_erc20_amount_to_display[MAX_DISPLAY_COUNT][INT256_LENGTH];
+} lr_complete_queued_withdrawal_t;
+
 typedef struct context_t {
     uint8_t next_param;
 
-    // buffers for LR display
-    int lr_strategy_to_display[MAX_DISPLAY_COUNT];
-    int lr_erc20_to_display[MAX_DISPLAY_COUNT];
-    uint8_t lr_erc20_amount_to_display[MAX_DISPLAY_COUNT][INT256_LENGTH];
-    size_t lr_display_buffer_size;
+    union {
+        lr_complete_queued_withdrawal_t lr_complete_queued_withdrawal;
+        lr_deposit_t lr_deposit;
+        lr_queue_withdrawal_t lr_queue_withdrawal;
+    } param_data;
 
     selector_t selectorIndex;
 } context_t;

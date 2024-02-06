@@ -175,25 +175,26 @@ static bool claim_ui_v2(ethQueryContractUI_t *msg) {
 
 static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *context) {
     bool ret = false;
+    lr_deposit_t *params = &context->param_data.lr_deposit;
 
     switch (msg->screenIndex) {
         case 0:
             strlcpy(msg->title, "Strategy", msg->titleLength);
-            if (context->lr_strategy_to_display[0] == -1) {
+            if (params->lr_strategy_to_display == -1) {
                 strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
             } else {
-                strlcpy(msg->msg, lr_tickers[context->lr_strategy_to_display[0]], MAX_TICKER_LEN);
+                strlcpy(msg->msg, lr_tickers[params->lr_strategy_to_display], MAX_TICKER_LEN);
             }
             ret = true;
             break;
         case 1:
             strlcpy(msg->title, "Amount", msg->titleLength);
-            amountToString(context->lr_erc20_amount_to_display[0],
-                           sizeof(context->lr_erc20_amount_to_display[0]),
+            amountToString(params->lr_erc20_amount_to_display,
+                           sizeof(params->lr_erc20_amount_to_display),
                            ERC20_DECIMALS,
-                           context->lr_erc20_to_display[0] == -1
+                           params->lr_erc20_to_display == -1
                                ? "UNKNOWN"
-                               : lr_tickers[context->lr_erc20_to_display[0]],
+                               : lr_tickers[params->lr_erc20_to_display],
                            msg->msg,
                            msg->msgLength);
             ret = true;
