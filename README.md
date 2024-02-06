@@ -192,7 +192,7 @@ The flow processed in [GitHub Actions](https://github.com/features/actions) is t
 
 ### LR Queue Withdrawal
 
-![](/tests/snapshots/nanox_lrQueueWithdrawal/00000.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00001.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00002.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00003.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00004.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00005.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00006.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00007.png)
+![](/tests/snapshots/nanox_lrQueueWithdrawal/00000.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00001.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00002.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00003.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00004.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00005.png) ![](/tests/snapshots/nanox_lrQueueWithdrawal/00006.png)
 
 ### LR Complete Queued Withdrawal
 
