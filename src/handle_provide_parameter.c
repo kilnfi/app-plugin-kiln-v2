@@ -254,6 +254,44 @@ void handle_lr_complete_queued_withdrawal(ethPluginProvideParameter_t *msg, cont
     msg->result = ETH_PLUGIN_RESULT_OK;
 }
 
+void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context) {
+    // delegateTo(address,(bytes,uint256),bytes32)
+    // example
+    // [0] selector
+    // [4] operator
+    // [36] signature_offset
+    // [68] approver_salt
+
+    uint8_t buffer[ADDRESS_LENGTH];
+    lr_delegate_to_t *params = &context->param_data.lr_delegate_to;
+
+    switch (context->next_param) {
+        case LR_DELEGATE_TO_OPERATOR:
+            copy_address(buffer, msg->parameter, sizeof(buffer));
+            getEthDisplayableAddress(buffer,
+                                     params->operator_address,
+                                     sizeof(params->operator_address),
+                                     0);
+
+            params->is_kiln = false;
+            if (compare_addresses((const char *) buffer, lr_kiln_operator_address)) {
+                params->is_kiln = true;
+            }
+            context->next_param = LR_DELEGATE_TO_SIGNATURE_OFFSET;
+            break;
+        case LR_DELEGATE_TO_SIGNATURE_OFFSET:
+            context->next_param = LR_DELEGATE_TO_APPROVER_SALT;
+            break;
+        case LR_DELEGATE_TO_APPROVER_SALT:
+            context->next_param = LR_DELEGATE_TO_UNEXPECTED_PARAMETER;
+            break;
+        default:
+            PRINTF("Param not supported: %d\n", context->next_param);
+            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            return;
+    }
+}
+
 void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
 
@@ -299,6 +337,9 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
             break;
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
             handle_lr_complete_queued_withdrawal(msg, context);
+            break;
+        case KILN_LR_DELEGATE_TO:
+            handle_lr_delegate_to(msg, context);
             break;
 
         default:

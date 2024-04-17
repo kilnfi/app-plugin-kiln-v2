@@ -65,6 +65,9 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
             context->next_param = LR_COMPLETE_QUEUED_WITHDRAWAL_QUEUEDWITHDRAWAL_OFFSET;
             break;
+        case KILN_LR_DELEGATE_TO:
+            context->next_param = LR_DELEGATE_TO_OPERATOR;
+            break;
 
         default:
             PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);

@@ -254,6 +254,33 @@ static bool complete_queued_withdrawal_ui_lr(ethQueryContractUI_t *msg) {
     return ret;
 }
 
+static bool complete_delegate_to_ui_lr(ethQueryContractUI_t *msg, context_t *context) {
+    bool ret = false;
+    lr_delegate_to_t *params = &context->param_data.lr_delegate_to;
+
+    switch (msg->screenIndex) {
+        case 0:
+            strlcpy(msg->title, "EigenLayer", msg->titleLength);
+            strlcpy(msg->msg, "Delegate To", msg->msgLength);
+            ret = true;
+            break;
+        case 1:
+            strlcpy(msg->title, "Operator", msg->titleLength);
+            if (params->is_kiln) {
+                strlcpy(msg->msg, "Kiln", msg->msgLength);
+            } else {
+                strlcpy(msg->msg, params->operator_address, msg->msgLength);
+            }
+            ret = true;
+            break;
+
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+            break;
+    }
+    return ret;
+}
+
 void handle_query_contract_ui(ethQueryContractUI_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
     bool ret = false;
@@ -308,6 +335,10 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
 
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
             ret = complete_queued_withdrawal_ui_lr(msg);
+            break;
+
+        case KILN_LR_DELEGATE_TO:
+            ret = complete_delegate_to_ui_lr(msg, context);
             break;
 
         default:

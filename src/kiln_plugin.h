@@ -30,8 +30,9 @@
 // --- 13. queueWithdrawal(uint256[],address[],uint256[],address,bool)
 // --- 14.
 // completeQueuedWithdrawal((address,address,address,uint256,uint32,address[],uint256[]),address[],uint256,bool)
+// --- 15. delegateTo(address,(bytes,uint256),bytes32)
 //
-#define NUM_SELECTORS 15
+#define NUM_SELECTORS 16
 
 // Selectors available (see mapping above).
 typedef enum {
@@ -50,6 +51,7 @@ typedef enum {
     KILN_LR_DEPOSIT_INTO_STRATEGY,
     KILN_LR_QUEUE_WITHDRAWAL,
     KILN_LR_COMPLETE_QUEUED_WITHDRAWAL,
+    KILN_LR_DELEGATE_TO,
 } selector_t;
 
 extern const uint32_t KILN_SELECTORS[NUM_SELECTORS];
@@ -92,11 +94,20 @@ typedef enum {
     LR_COMPLETE_QUEUED_WITHDRAWAL_UNEXPECTED_PARAMETER
 } lr_complete_queued_withdrawal_parameters;
 
+// Parameters for LR delegate to selector.
+typedef enum {
+    LR_DELEGATE_TO_OPERATOR = 0,
+    LR_DELEGATE_TO_SIGNATURE_OFFSET,
+    LR_DELEGATE_TO_APPROVER_SALT,
+    LR_DELEGATE_TO_UNEXPECTED_PARAMETER
+} lr_delegate_to_parameters;
+
 #define LR_STRATEGIES_COUNT 11
 
 extern const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
 extern const char lr_erc20_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
 extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
+extern const char lr_kiln_operator_address[ADDRESS_STR_LEN];
 
 // max number of strategies / erc20 to display
 #define MAX_DISPLAY_COUNT 3
@@ -119,6 +130,11 @@ typedef struct {
     bool go_to_offset;
 } lr_complete_queued_withdrawal_t;
 
+typedef struct {
+    char operator_address[ADDRESS_STR_LEN];
+    bool is_kiln;
+} lr_delegate_to_t;
+
 typedef struct context_t {
     uint8_t next_param;
 
@@ -126,6 +142,7 @@ typedef struct context_t {
         lr_complete_queued_withdrawal_t lr_complete_queued_withdrawal;
         lr_deposit_t lr_deposit;
         lr_queue_withdrawal_t lr_queue_withdrawal;
+        lr_delegate_to_t lr_delegate_to;
     } param_data;
 
     selector_t selectorIndex;

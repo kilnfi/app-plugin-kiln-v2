@@ -56,6 +56,10 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
             strlcpy(msg->version, "Liquid Restaking", msg->versionLength);
             break;
 
+        case KILN_LR_DELEGATE_TO:
+            strlcpy(msg->version, "EigenLayer Delegate", msg->versionLength);
+            break;
+
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;
