@@ -27,7 +27,7 @@
 //
 // LR selectors
 // --- 12. depositIntoStrategy(address,address,uint256)
-// --- 13. queueWithdrawal(uint256[],address[],uint256[],address,bool)
+// --- 13. queueWithdrawals((address[],uint256[],address)[])
 // --- 14.
 // completeQueuedWithdrawal((address,address,address,uint256,uint32,address[],uint256[]),address[],uint256,bool)
 // --- 15. delegateTo(address,(bytes,uint256),bytes32)
@@ -50,7 +50,7 @@ typedef enum {
     KILN_V2_MULTICLAIM,
     KILN_V2_CLAIM,
     KILN_LR_DEPOSIT_INTO_STRATEGY,
-    KILN_LR_QUEUE_WITHDRAWAL,
+    KILN_LR_QUEUE_WITHDRAWALS,
     KILN_LR_COMPLETE_QUEUED_WITHDRAWAL,
     KILN_LR_DELEGATE_TO,
     KILN_LR_UNDELEGATE,
@@ -77,15 +77,19 @@ typedef enum {
     LR_DEPOSIT_INTO_STRATEGY_UNEXPECTED_PARAMETER,
 } lr_deposit_into_strategy_parameters;
 
-// Parameters for LR queue withdrawal selector.
+// Parameters for LR queue withdrawals selector.
 typedef enum {
-    LR_QUEUE_WITHDRAWAL_STRATEGY_INDEXES_OFFSET = 0,
-    LR_QUEUE_WITHDRAWAL_STRATEGIES_OFFSET,
-    LR_QUEUE_WITHDRAWAL_SHARES_OFFSET,
-    LR_QUEUE_WITHDRAWAL_WITHDRAWER,
-    LR_QUEUE_WITHDRAWAL_UNDELEGATEIFPOSSIBLE,
-    LR_QUEUE_WITHDRAWAL_UNEXPECTED_PARAMETER
-} lr_queue_withdrawal_parameters;
+    LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET = 0,
+    LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__SHARES_ITEM,
+    LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER
+} lr_queue_withdrawals_parameters;
 
 // Parameters for LR complete queued withdrawal selector.
 typedef enum {
@@ -122,10 +126,13 @@ typedef struct {
 } lr_deposit_t;
 
 typedef struct {
-    uint16_t skip_offset;
-    bool go_to_offset;
+    // utils
+    uint16_t queued_withdrawals_nb;
+    uint16_t current_item_nb;
+    // display
     char withdrawer[ADDRESS_STR_LEN];
-} lr_queue_withdrawal_t;
+    bool strategies[LR_STRATEGIES_COUNT];
+} lr_queue_withdrawals_t;
 
 typedef struct {
     uint16_t skip_offset;
@@ -143,7 +150,7 @@ typedef struct context_t {
     union {
         lr_complete_queued_withdrawal_t lr_complete_queued_withdrawal;
         lr_deposit_t lr_deposit;
-        lr_queue_withdrawal_t lr_queue_withdrawal;
+        lr_queue_withdrawals_t lr_queue_withdrawals;
         lr_delegate_to_t lr_delegate_to;
     } param_data;
 

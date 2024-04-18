@@ -25,8 +25,17 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             msg->numScreens = 3;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
-        case KILN_LR_QUEUE_WITHDRAWAL:
-            msg->numScreens = 2;
+        case KILN_LR_QUEUE_WITHDRAWALS:
+            msg->numScreens = 1;
+
+            lr_queue_withdrawals_t *params = &context->param_data.lr_queue_withdrawals;
+            params->queued_withdrawals_nb = 0;
+            for (size_t i = 0; i < LR_STRATEGIES_COUNT; i += 1) {
+                if (params->strategies[i]) {
+                    msg->numScreens += 1;
+                    params->queued_withdrawals_nb += 1;
+                }
+            }
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:

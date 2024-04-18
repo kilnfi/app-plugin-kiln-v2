@@ -48,7 +48,7 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
             strlcpy(msg->version, "Liquid Restaking", msg->versionLength);
             break;
 
-        case KILN_LR_QUEUE_WITHDRAWAL:
+        case KILN_LR_QUEUE_WITHDRAWALS:
             strlcpy(msg->version, "Liquid Restaking", msg->versionLength);
             break;
 

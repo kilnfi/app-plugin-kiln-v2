@@ -96,84 +96,115 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
     msg->result = ETH_PLUGIN_RESULT_OK;
 }
 
-void handle_lr_queue_withdrawal(ethPluginProvideParameter_t *msg, context_t *context) {
-    // queueWithdrawal(uint256[],address[],uint256[],address,bool
-    // example for queue withdrawal with 2 strategies indexes, contracts and shares
-    // [0] selector
-    // [4] strat_i_offset -- starting here
-    // [36] strat_offset
-    // [68] shares_offset
-    // [100] withdrawal
-    // [132] undelegateIfPossible
-    // [164] strat_i_length
-    // [196] strat_i[0]
-    // [228] strat_i[1]
-    // [260] strat_length
-    // [292] strat[0]
-    // [324] strat[1]
-    // [356] shares_length
-    // [388] shares[0]
-    // [420] shares[1]
+void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *context) {
+    // queuedWithdrawals = (address strategies[],uint256 shares[],address withdrawer)
+    // queueWithdrawals(queuedWithdrawals[])
+    // example for queue withdrawals with 2 strategies
+    // [  0] selector
+    // [ 36] queuedWithdrawals_offset
+    // [ 68] queuedWithdrawals_length
+    // [100] queuedWithdrawals_0
+    //        [100] strategies_offset
+    //        [132] shares_offset
+    //        [164] withdrawer
+    //        [196] strategies_length
+    //        [228] strategies_0
+    //        [260] strategies_1
+    //        [292] shares_length
+    //        [324] shares_0
+    //        [356] shares_1
+    // [388] queuedWithdrawals_1
+    //        [388] strategies_offset
+    //        [420] shares_offset
+    //        [452] withdrawer
+    //        [484] strategies_length
+    //        [516] strategies_0
+    //        [548] strategies_1
+    //        [580] shares_length
+    //        [612] shares_0
+    //        [644] shares_1
 
     uint8_t buffer[ADDRESS_LENGTH];
-    lr_queue_withdrawal_t *params = &context->param_data.lr_queue_withdrawal;
-
-    if (params->skip_offset != 0 && params->go_to_offset == false &&
-        msg->parameterOffset == params->skip_offset + SELECTOR_LENGTH) {
-        // if we reach offset, we get the size of the array and skip parsing it
-        // in the condition of the default switch case
-
-        // with the example above:
-        // before:
-        // [356] shares_length -- skip_offset
-        // [388] shares[0]
-        // [420] shares[1]
-        params->skip_offset +=
-            U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset)) * PARAMETER_LENGTH;
-        // after:
-        // [356] shares_length
-        // [388] shares[0]
-        // [420] shares[1] -- skip_offset
-        params->go_to_offset = true;
-    }
+    lr_queue_withdrawals_t *params = &context->param_data.lr_queue_withdrawals;
 
     switch (context->next_param) {
-        case LR_QUEUE_WITHDRAWAL_STRATEGY_INDEXES_OFFSET:
-            params->go_to_offset = false;
-            context->next_param = LR_QUEUE_WITHDRAWAL_STRATEGIES_OFFSET;
+        // 1. queuedWithdrawals array setup
+        case LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET:
+            context->next_param = LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH;
             break;
-        case LR_QUEUE_WITHDRAWAL_STRATEGIES_OFFSET:
-            context->next_param = LR_QUEUE_WITHDRAWAL_SHARES_OFFSET;
+        case LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH:
+            params->queued_withdrawals_nb = U2BE(msg->parameter, PARAMETER_LENGTH);
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET;
             break;
-        case LR_QUEUE_WITHDRAWAL_SHARES_OFFSET:
-            // before:
-            // skip_offset = 0
-            params->skip_offset =
-                U2BE(msg->parameter, PARAMETER_LENGTH - sizeof(params->skip_offset));
-            // after:
-            // [356] shares_length -- skip_offset
-            // [388] shares[0]
-            // [420] shares[1]
-            context->next_param = LR_QUEUE_WITHDRAWAL_WITHDRAWER;
+
+        // 2. entering a queuedWithdrawal
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET:
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET;
             break;
-        case LR_QUEUE_WITHDRAWAL_WITHDRAWER:
-            copy_address(buffer, msg->parameter, sizeof(buffer));
-            getEthDisplayableAddress(buffer,
-                                     context->param_data.lr_queue_withdrawal.withdrawer,
-                                     sizeof(context->param_data.lr_queue_withdrawal.withdrawer),
-                                     0);
-            context->next_param = LR_QUEUE_WITHDRAWAL_UNDELEGATEIFPOSSIBLE;
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET:
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
             break;
-        case LR_QUEUE_WITHDRAWAL_UNDELEGATEIFPOSSIBLE:
-            context->next_param = LR_QUEUE_WITHDRAWAL_UNEXPECTED_PARAMETER;
-            break;
-        default:
-            if (msg->parameterOffset <= params->skip_offset + SELECTOR_LENGTH) {
-                // as we don't want to display the strategy indexes, strategies and shares amount
-                // we skip parsing them until skip_offset is reached
-                msg->result = ETH_PLUGIN_RESULT_OK;
-                return;
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER:
+            // EigenLayer contract does not allow withdrawer to be different than msg.sender
+            // https://github.com/Layr-Labs/eigenlayer-contracts/blob/7229f2b426b6f2a24c7795
+            // b1a4687a010eac8ef2/src/contracts/core/DelegationManager.sol#L275
+            // so we can only copy it once
+            if (params->withdrawer[0] == '\0') {
+                copy_address(buffer, msg->parameter, sizeof(buffer));
+                getEthDisplayableAddress(buffer, params->withdrawer, sizeof(params->withdrawer), 0);
             }
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH;
+            break;
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH:
+            // get number of item to parse
+            params->current_item_nb = U2BE(msg->parameter, PARAMETER_LENGTH);
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM;
+            break;
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM:
+            // get strategy we need to display
+            copy_address(buffer, msg->parameter, sizeof(buffer));
+            char address_buffer[ADDRESS_STR_LEN];
+            getEthDisplayableAddress(buffer, address_buffer, sizeof(address_buffer), 0);
+
+            int strategy_index = find_lr_known_strategy(address_buffer);
+            if (strategy_index != -1) {
+                params->strategies[strategy_index] = true;
+            }
+
+            // we just processed one strategy item
+            params->current_item_nb -= 1;
+            if (params->current_item_nb == 0) {
+                // when we arrive at the end of the strategies array we go to the shares array
+                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH;
+            }
+            break;
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH:
+            // get number of item to parse
+            params->current_item_nb = U2BE(msg->parameter, PARAMETER_LENGTH);
+
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__SHARES_ITEM;
+            break;
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__SHARES_ITEM:
+            // we skip parsing shares item as they are not needed for clearsigning
+            // as not having ETH / ERC20 amount to display would confuse users
+            params->current_item_nb -= 1;
+            if (params->current_item_nb == 0) {
+                // here we arrive at the end of the queuedWithdrawal array element
+
+                // check if there are other queuedWithdrawals to parse
+                params->queued_withdrawals_nb -= 1;
+                if (params->queued_withdrawals_nb == 0) {
+                    // if not we finished parsing
+                    context->next_param = LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER;
+                } else {
+                    // if there are other queuedWithdrawals we go back to parsing the strategies
+                    // offset
+                    context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET;
+                }
+            }
+            break;
+
+        default:
             PRINTF("Param not supported: %d\n", context->next_param);
             msg->result = ETH_PLUGIN_RESULT_ERROR;
             return;
@@ -333,8 +364,8 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
             handle_lr_deposit_into_strategy(msg, context);
             break;
-        case KILN_LR_QUEUE_WITHDRAWAL:
-            handle_lr_queue_withdrawal(msg, context);
+        case KILN_LR_QUEUE_WITHDRAWALS:
+            handle_lr_queue_withdrawals(msg, context);
             break;
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
             handle_lr_complete_queued_withdrawal(msg, context);

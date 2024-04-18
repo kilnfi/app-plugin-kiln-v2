@@ -213,24 +213,36 @@ static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *con
     return ret;
 }
 
-static bool queue_withdrawal_ui_lr(ethQueryContractUI_t *msg, context_t *context) {
+static bool queue_withdrawals_ui_lr(ethQueryContractUI_t *msg, context_t *context) {
     bool ret = false;
-    lr_queue_withdrawal_t *params = &context->param_data.lr_queue_withdrawal;
+    lr_queue_withdrawals_t *params = &context->param_data.lr_queue_withdrawals;
 
     switch (msg->screenIndex) {
         case 0:
             strlcpy(msg->title, "EigenLayer", msg->titleLength);
-            strlcpy(msg->msg, "Queue Withdrawal", msg->msgLength);
-            ret = true;
-            break;
-
-        case 1:
-            strlcpy(msg->title, "Withdrawer", msg->titleLength);
-            strlcpy(msg->msg, params->withdrawer, msg->msgLength);
+            strlcpy(msg->msg, "Queue Withdrawals", msg->msgLength);
             ret = true;
             break;
 
         default:
+            if (params->queued_withdrawals_nb > 0) {
+                strlcpy(msg->title, "Strategy", msg->titleLength);
+
+                // process the first displayable strategy and remove it from the list
+                for (size_t i = 0; i < LR_STRATEGIES_COUNT; i += 1) {
+                    if (params->strategies[i]) {
+                        strlcpy(msg->msg, lr_tickers[i], msg->msgLength);
+                        params->strategies[i] = false;
+                        break;
+                    }
+                }
+
+                params->queued_withdrawals_nb -= 1;
+
+                ret = true;
+                break;
+            }
+
             PRINTF("Received an invalid screenIndex\n");
             break;
     }
@@ -346,8 +358,8 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
             ret = deposit_into_stragey_ui_lr(msg, context);
             break;
 
-        case KILN_LR_QUEUE_WITHDRAWAL:
-            ret = queue_withdrawal_ui_lr(msg, context);
+        case KILN_LR_QUEUE_WITHDRAWALS:
+            ret = queue_withdrawals_ui_lr(msg, context);
             break;
 
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:

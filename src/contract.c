@@ -31,8 +31,8 @@ static const uint32_t KILN_V2_CLAIM_SELECTOR = 0xadcf1163;
 // RESTAKING - Liquid Restaking
 // --- cast sig "depositIntoStrategy(address,address,uint256)"
 static const uint32_t KILN_LR_DEPOSIT_INTO_STRATEGY_SELECTOR = 0xe7a050aa;
-// --- cast sig "queueWithdrawal(uint256[],address[],uint256[],address,bool)"
-static const uint32_t KILN_LR_QUEUE_WITHDRAWAL_SELECTOR = 0xf123991e;
+// --- cast sig "queueWithdrawals((address[],uint256[],address)[])"
+static const uint32_t KILN_LR_QUEUE_WITHDRAWALS_SELECTOR = 0x0dd8dd02;
 // --- cast sig
 // "completeQueuedWithdrawal((address[],uint256[],address,(address,uint96),uint32,address),address[],uint256,bool)"
 static const uint32_t KILN_LR_COMPLETE_QUEUED_WITHDRAWAL_SELECTOR = 0xf3be65d3;
@@ -58,7 +58,7 @@ const uint32_t KILN_SELECTORS[NUM_SELECTORS] = {
     KILN_V2_CLAIM_SELECTOR,
     // LR
     KILN_LR_DEPOSIT_INTO_STRATEGY_SELECTOR,
-    KILN_LR_QUEUE_WITHDRAWAL_SELECTOR,
+    KILN_LR_QUEUE_WITHDRAWALS_SELECTOR,
     KILN_LR_COMPLETE_QUEUED_WITHDRAWAL_SELECTOR,
     KILN_LR_DELEGATE_TO_SELECTOR,
     KILN_LR_UNDELEGATE_SELECTOR,
