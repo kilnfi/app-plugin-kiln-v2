@@ -63,4 +63,48 @@ nano_models.forEach(function (model) {
     }),
     30000
   );
+
+  test(
+    '[Nano ' + model.letter + '] LR Delegate To - is NOT Kiln',
+    zemu(model, async (sim, eth) => {
+      const contract = new ethers.Contract(contractAddr, abi);
+
+      const { data } = await contract.populateTransaction.delegateTo(
+        '0x645a845f80576a25f1b412330a108780f6c4573d', // kiln operator
+        {
+          signature: '0x',
+          expiry: 0,
+        },
+        0
+      );
+
+      let unsignedTx = genericTx;
+
+      unsignedTx.to = contractAddr;
+      unsignedTx.data = data;
+      unsignedTx.value = parseEther('0');
+
+      const serializedTx = ethers.utils
+        .serializeTransaction(unsignedTx)
+        .slice(2);
+      const resolution = await ledgerService.resolveTransaction(
+        serializedTx,
+        eth.loadConfig,
+        {
+          externalPlugins: true,
+        }
+      );
+      const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
+      const right_clicks = model.letter === 'S' ? 7 : 5;
+
+      await waitForAppScreen(sim);
+      await sim.navigateAndCompareSnapshots(
+        '.',
+        model.name + '_delegate_to_is_not_kiln',
+        [right_clicks, 0]
+      );
+      await tx;
+    }),
+    30000
+  );
 });
