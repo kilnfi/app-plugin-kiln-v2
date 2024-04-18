@@ -290,6 +290,7 @@ void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context)
             msg->result = ETH_PLUGIN_RESULT_ERROR;
             return;
     }
+    msg->result = ETH_PLUGIN_RESULT_OK;
 }
 
 void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
@@ -340,6 +341,9 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
             break;
         case KILN_LR_DELEGATE_TO:
             handle_lr_delegate_to(msg, context);
+            break;
+        case KILN_LR_UNDELEGATE:
+            msg->result = ETH_PLUGIN_RESULT_OK;
             break;
 
         default:

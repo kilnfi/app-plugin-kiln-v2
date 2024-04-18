@@ -31,8 +31,9 @@
 // --- 14.
 // completeQueuedWithdrawal((address,address,address,uint256,uint32,address[],uint256[]),address[],uint256,bool)
 // --- 15. delegateTo(address,(bytes,uint256),bytes32)
+// --- 16. undelegate(address)
 //
-#define NUM_SELECTORS 16
+#define NUM_SELECTORS 17
 
 // Selectors available (see mapping above).
 typedef enum {
@@ -52,6 +53,7 @@ typedef enum {
     KILN_LR_QUEUE_WITHDRAWAL,
     KILN_LR_COMPLETE_QUEUED_WITHDRAWAL,
     KILN_LR_DELEGATE_TO,
+    KILN_LR_UNDELEGATE,
 } selector_t;
 
 extern const uint32_t KILN_SELECTORS[NUM_SELECTORS];

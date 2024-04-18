@@ -58,7 +58,7 @@ nano_models.forEach(function (model) {
         '.',
         model.name + '_delegate_to_is_kiln',
         [right_clicks, 0]
-      );
+      );    
       await tx;
     }),
     30000
@@ -70,7 +70,7 @@ nano_models.forEach(function (model) {
       const contract = new ethers.Contract(contractAddr, abi);
 
       const { data } = await contract.populateTransaction.delegateTo(
-        '0x645a845f80576a25f1b412330a108780f6c4573d', // kiln operator
+        '0x645a845f80576a25f1b412330a108780f6c4573d', // not kiln operator
         {
           signature: '0x',
           expiry: 0,

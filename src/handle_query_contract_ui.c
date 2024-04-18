@@ -254,7 +254,7 @@ static bool complete_queued_withdrawal_ui_lr(ethQueryContractUI_t *msg) {
     return ret;
 }
 
-static bool complete_delegate_to_ui_lr(ethQueryContractUI_t *msg, context_t *context) {
+static bool delegate_to_ui_lr(ethQueryContractUI_t *msg, context_t *context) {
     bool ret = false;
     lr_delegate_to_t *params = &context->param_data.lr_delegate_to;
 
@@ -271,6 +271,23 @@ static bool complete_delegate_to_ui_lr(ethQueryContractUI_t *msg, context_t *con
             } else {
                 strlcpy(msg->msg, params->operator_address, msg->msgLength);
             }
+            ret = true;
+            break;
+
+        default:
+            PRINTF("Received an invalid screenIndex\n");
+            break;
+    }
+    return ret;
+}
+
+static bool undelegate_ui_lr(ethQueryContractUI_t *msg) {
+    bool ret = false;
+
+    switch (msg->screenIndex) {
+        case 0:
+            strlcpy(msg->title, "EigenLayer", msg->titleLength);
+            strlcpy(msg->msg, "Undelegate all", msg->msgLength);
             ret = true;
             break;
 
@@ -338,7 +355,11 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
             break;
 
         case KILN_LR_DELEGATE_TO:
-            ret = complete_delegate_to_ui_lr(msg, context);
+            ret = delegate_to_ui_lr(msg, context);
+            break;
+
+        case KILN_LR_UNDELEGATE:
+            ret = undelegate_ui_lr(msg);
             break;
 
         default:

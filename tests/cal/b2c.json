@@ -96,9 +96,14 @@
                 "0xeea9064b": {
                     "method": "delegateTo",
                     "plugin": "Kiln"
+                },
+                "0xda8be864": {
+                    "method": "undelegate",
+                    "plugin": "Kiln"
                 }
             }
         }
-    ],
-    "name": "Kiln"
+    }
+],
+"name": "Kiln"
 }

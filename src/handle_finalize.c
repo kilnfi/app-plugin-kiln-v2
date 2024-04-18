@@ -37,6 +37,10 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             msg->numScreens = 2;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
+        case KILN_LR_UNDELEGATE:
+            msg->numScreens = 1;
+            msg->result = ETH_PLUGIN_RESULT_OK;
+            break;
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;

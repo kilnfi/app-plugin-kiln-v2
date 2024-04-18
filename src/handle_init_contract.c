@@ -68,6 +68,8 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
         case KILN_LR_DELEGATE_TO:
             context->next_param = LR_DELEGATE_TO_OPERATOR;
             break;
+        case KILN_LR_UNDELEGATE:
+            break;
 
         default:
             PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);
