@@ -20,11 +20,11 @@ bool compare_addresses(const char a[ADDRESS_STR_LEN], const char b[ADDRESS_STR_L
 
 /*
  * If address is a known erc20, update lr display context with its name
- * otherwise set it to unkwown (-1)
+ * otherwise set it to unkwown (UNKNOW_LR_STRATEGY)
  *
  * @param address: address to compare
  *
- * @returns index of the erc20 in the context or -1 if not found
+ * @returns index of the erc20 in the context or UNKNOW_LR_STRATEGY if not found
  */
 int find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
@@ -33,16 +33,16 @@ int find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
         }
     }
     // if unknown erc20, indicate it
-    return -1;
+    return UNKNOW_LR_STRATEGY;
 }
 
 /*
  * If address is a known strategy, update lr display context with its name
- * otherwise set it to unkwown (-1)
+ * otherwise set it to unkwown (UNKNOW_LR_STRATEGY)
  *
  * @param address: address to compare
  *
- * @returns index of the strategy in the context or -1 if not found
+ * @returns index of the strategy in the context or UNKNOW_LR_STRATEGY if not found
  */
 int find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
@@ -51,7 +51,7 @@ int find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
         }
     }
     // if unknown strategy, indicate it
-    return -1;
+    return UNKNOW_LR_STRATEGY;
 }
 
 /*
@@ -99,20 +99,22 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
 void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *context) {
     // queuedWithdrawals = (address strategies[],uint256 shares[],address withdrawer)
     // queueWithdrawals(queuedWithdrawals[])
-    // example for queue withdrawals with 2 strategies
+    // example for 2 queue withdrawals with 2 strategies each (2x2 dimension)
     // [  0] selector
-    // [ 36] queuedWithdrawals_offset
-    // [ 68] queuedWithdrawals_length
-    // [100] queuedWithdrawals_0
-    //        [100] strategies_offset
-    //        [132] shares_offset
-    //        [164] withdrawer
-    //        [196] strategies_length
-    //        [228] strategies_0
-    //        [260] strategies_1
-    //        [292] shares_length
-    //        [324] shares_0
-    //        [356] shares_1
+    // [  4] queuedWithdrawals_offset
+    // [ 36] queuedWithdrawals_length
+    // [ 68] queuedWithdrawals_0_offset
+    // [100] queuedWithdrawals_1_offset
+    // [132] queuedWithdrawals_0
+    //        [132] strategies_offset
+    //        [164] shares_offset
+    //        [196] withdrawer
+    //        [228] strategies_length
+    //        [260] strategies_0
+    //        [292] strategies_1
+    //        [324] shares_length
+    //        [356] shares_0
+    //        [388] shares_1
     // [388] queuedWithdrawals_1
     //        [388] strategies_offset
     //        [420] shares_offset
@@ -133,16 +135,32 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
             context->next_param = LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH;
             break;
         case LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH:
-            params->queued_withdrawals_nb = U2BE(msg->parameter, PARAMETER_LENGTH);
-            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET;
+            U2BE_from_parameter(msg->parameter, &params->queued_withdrawals_count);
+            params->current_item_count = params->queued_withdrawals_count;
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET;
             break;
 
         // 2. entering a queuedWithdrawal
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET:
+            // we skip all the queuewithdrawal structs offsets
+            PRINTF("CURRENT ITEM COUNT: %d\n", params->current_item_count);
+            if (params->current_item_count > 0) {
+                params->current_item_count -= 1;
+            }
+
+            if (params->current_item_count == 0) {
+                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET;
+            }
+            break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET:
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET:
-            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
+            if (params->withdrawer[0] == '\0') {
+                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
+            } else {
+                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH;
+            }
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER:
             // EigenLayer contract does not allow withdrawer to be different than msg.sender
@@ -157,7 +175,8 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH:
             // get number of item to parse
-            params->current_item_nb = U2BE(msg->parameter, PARAMETER_LENGTH);
+            U2BE_from_parameter(msg->parameter, &params->current_item_count);
+
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM:
@@ -167,39 +186,42 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
             getEthDisplayableAddress(buffer, address_buffer, sizeof(address_buffer), 0);
 
             int strategy_index = find_lr_known_strategy(address_buffer);
-            if (strategy_index != -1) {
-                params->strategies[strategy_index] = true;
-            }
+            params->strategies[params->strategies_count] =
+                (strategy_index != UNKNOW_LR_STRATEGY) ? strategy_index + 1 : UNKNOW_LR_STRATEGY;
 
+            PRINTF("STRATEGY #: %d STRATEGY: %d\n", params->strategies_count, strategy_index);
             // we just processed one strategy item
-            params->current_item_nb -= 1;
-            if (params->current_item_nb == 0) {
+            params->strategies_count += 1;
+            params->current_item_count -= 1;
+            if (params->current_item_count == 0) {
                 // when we arrive at the end of the strategies array we go to the shares array
                 context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH;
             }
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH:
-            // get number of item to parse
-            params->current_item_nb = U2BE(msg->parameter, PARAMETER_LENGTH);
+            // get number of items to parse
+            U2BE_from_parameter(msg->parameter, &params->current_item_count);
 
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__SHARES_ITEM;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__SHARES_ITEM:
             // we skip parsing shares item as they are not needed for clearsigning
             // as not having ETH / ERC20 amount to display would confuse users
-            params->current_item_nb -= 1;
-            if (params->current_item_nb == 0) {
+            if (params->current_item_count > 0) {
+                params->current_item_count -= 1;
+            }
+            if (params->current_item_count == 0) {
                 // here we arrive at the end of the queuedWithdrawal array element
 
                 // check if there are other queuedWithdrawals to parse
-                params->queued_withdrawals_nb -= 1;
-                if (params->queued_withdrawals_nb == 0) {
+                params->queued_withdrawals_count -= 1;
+                if (params->queued_withdrawals_count == 0) {
                     // if not we finished parsing
                     context->next_param = LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER;
                 } else {
-                    // if there are other queuedWithdrawals we go back to parsing the strategies
-                    // offset
-                    context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET;
+                    // if there are other queuedWithdrawals we go back to parsing the
+                    // next queueWithdrawal struct offset
+                    context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET;
                 }
             }
             break;

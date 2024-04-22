@@ -79,8 +79,8 @@
                     "method": "depositIntoStrategy",
                     "plugin": "Kiln"
                 },
-                "0xf123991e": {
-                    "method": "queueWithdrawal",
+                "0x0dd8dd02": {
+                    "method": "queueWithdrawals",
                     "plugin": "Kiln"
                 },
                 "0xf3be65d3": {
@@ -103,7 +103,6 @@
                 }
             }
         }
-    }
-],
-"name": "Kiln"
+    ],
+    "name": "Kiln"
 }

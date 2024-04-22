@@ -81,6 +81,7 @@ typedef enum {
 typedef enum {
     LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET = 0,
     LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET,
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET,
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET,
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER,
@@ -125,13 +126,23 @@ typedef struct {
     uint8_t erc20_amount_to_display[INT256_LENGTH];
 } lr_deposit_t;
 
+#define UNKNOW_LR_STRATEGY 255
+
 typedef struct {
-    // utils
-    uint16_t queued_withdrawals_nb;
-    uint16_t current_item_nb;
-    // display
+    //  -- utils
+    uint16_t queued_withdrawals_count;
+    uint16_t current_item_count;
+    // -- display
+    uint8_t strategies_count;
     char withdrawer[ADDRESS_STR_LEN];
-    bool strategies[LR_STRATEGIES_COUNT];
+    // list of strategies indexes **INCREMENTED BY 1** to display in the UI
+    // 0 is reserved for end of array
+    // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // (i) in practice, we should not encounter more than
+    //      LR_STRATEGIES_COUNT +~ a few potential unsupported
+    //      strategies in the plugin. So * 3 should be a good enough buffer.
+    // (ii) in practice there should not be more than (2 ** 8) - 2 known strategies
+    uint8_t strategies[LR_STRATEGIES_COUNT * 3];
 } lr_queue_withdrawals_t;
 
 typedef struct {

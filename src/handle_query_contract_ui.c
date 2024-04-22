@@ -185,7 +185,7 @@ static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *con
             break;
         case 1:
             strlcpy(msg->title, "Strategy", msg->titleLength);
-            if (params->strategy_to_display == -1 ||
+            if (params->strategy_to_display == UNKNOW_LR_STRATEGY ||
                 params->strategy_to_display >= LR_STRATEGIES_COUNT) {
                 strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
             } else {
@@ -195,15 +195,15 @@ static bool deposit_into_stragey_ui_lr(ethQueryContractUI_t *msg, context_t *con
             break;
         case 2:
             strlcpy(msg->title, "Amount", msg->titleLength);
-            amountToString(
-                params->erc20_amount_to_display,
-                sizeof(params->erc20_amount_to_display),
-                ERC20_DECIMALS,
-                params->erc20_to_display == -1 || params->erc20_to_display >= LR_STRATEGIES_COUNT
-                    ? "UNKNOWN"
-                    : lr_tickers[params->erc20_to_display],
-                msg->msg,
-                msg->msgLength);
+            amountToString(params->erc20_amount_to_display,
+                           sizeof(params->erc20_amount_to_display),
+                           ERC20_DECIMALS,
+                           params->erc20_to_display == UNKNOW_LR_STRATEGY ||
+                                   params->erc20_to_display >= LR_STRATEGIES_COUNT
+                               ? "UNKNOWN"
+                               : lr_tickers[params->erc20_to_display],
+                           msg->msg,
+                           msg->msgLength);
             ret = true;
             break;
         default:
@@ -224,27 +224,40 @@ static bool queue_withdrawals_ui_lr(ethQueryContractUI_t *msg, context_t *contex
             ret = true;
             break;
 
-        default:
-            if (params->queued_withdrawals_nb > 0) {
-                strlcpy(msg->title, "Strategy", msg->titleLength);
+        case 1:
+            strlcpy(msg->title, "Withdrawer", msg->titleLength);
+            strlcpy(msg->msg, params->withdrawer, msg->msgLength);
+            ret = true;
+            break;
 
-                // process the first displayable strategy and remove it from the list
-                for (size_t i = 0; i < LR_STRATEGIES_COUNT; i += 1) {
-                    if (params->strategies[i]) {
-                        strlcpy(msg->msg, lr_tickers[i], msg->msgLength);
-                        params->strategies[i] = false;
-                        break;
+        default: {
+            {
+                // removing the first screen to current screen index
+                // to get the index of the withdrawal
+                uint8_t withdrawal_index = msg->screenIndex - 2;
+
+                if (withdrawal_index < params->strategies_count) {
+                    strlcpy(msg->title, "Strategy", msg->titleLength);
+                    uint8_t strategy = params->strategies[withdrawal_index];
+
+                    if (strategy == UNKNOW_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
+                        char x[4] = {65 + strategy,
+                                     65 + withdrawal_index,
+                                     65 + params->strategies_count,
+                                     '\0'};
+
+                        strlcpy(msg->msg, x, msg->msgLength);
+                    } else {
+                        strlcpy(msg->msg, lr_tickers[strategy - 1], msg->msgLength);
                     }
                 }
-
-                params->queued_withdrawals_nb -= 1;
 
                 ret = true;
                 break;
             }
-
             PRINTF("Received an invalid screenIndex\n");
             break;
+        }
     }
     return ret;
 }
