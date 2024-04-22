@@ -156,11 +156,7 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET:
-            if (params->withdrawer[0] == '\0') {
-                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
-            } else {
-                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH;
-            }
+            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER:
             // EigenLayer contract does not allow withdrawer to be different than msg.sender
@@ -171,13 +167,20 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
                 copy_address(buffer, msg->parameter, sizeof(buffer));
                 getEthDisplayableAddress(buffer, params->withdrawer, sizeof(params->withdrawer), 0);
             }
+            PRINTF("WITHDRAWER: %s\n", params->withdrawer);
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH:
             // get number of item to parse
             U2BE_from_parameter(msg->parameter, &params->current_item_count);
+            PRINTF("STRATEGIES LENGTH: %d\n", params->current_item_count);
 
-            context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM;
+            if (params->current_item_count == 0) {
+                // if no strategies we go to the shares array
+                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH;
+            } else {
+                context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM;
+            }
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM:
             // get strategy we need to display
@@ -220,8 +223,8 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
                     context->next_param = LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER;
                 } else {
                     // if there are other queuedWithdrawals we go back to parsing the
-                    // next queueWithdrawal struct offset
-                    context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET;
+                    // next queueWithdrawal struct
+                    context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET;
                 }
             }
             break;

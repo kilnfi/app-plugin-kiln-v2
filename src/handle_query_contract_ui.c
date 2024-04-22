@@ -241,12 +241,7 @@ static bool queue_withdrawals_ui_lr(ethQueryContractUI_t *msg, context_t *contex
                     uint8_t strategy = params->strategies[withdrawal_index];
 
                     if (strategy == UNKNOW_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
-                        char x[4] = {65 + strategy,
-                                     65 + withdrawal_index,
-                                     65 + params->strategies_count,
-                                     '\0'};
-
-                        strlcpy(msg->msg, x, msg->msgLength);
+                        strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
                     } else {
                         strlcpy(msg->msg, lr_tickers[strategy - 1], msg->msgLength);
                     }

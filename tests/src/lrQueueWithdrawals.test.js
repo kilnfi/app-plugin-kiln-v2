@@ -44,7 +44,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 7 : 5;
+      const right_clicks = model.letter === 'S' ? 8 : 6;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
@@ -74,9 +74,9 @@ nano_models.forEach(function (model) {
         },
         {
           strategies: [
-            '0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa', // mETH
+            '0x298aFB19A105D59E74658C4C334Ff360BadE6dd2', // mETH
             '0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc', // cbETH
-            '0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3', // OETH
+            '0xa4C637e0F704745D182e4D38cAb7E7485321d059', // OETH
           ],
           shares: [parseEther('0.5'), parseEther('0.1'), parseEther('0.2')],
           withdrawer: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
@@ -100,7 +100,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 7 : 5;
+      const right_clicks = model.letter === 'S' ? 12 : 10;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
@@ -129,8 +129,8 @@ nano_models.forEach(function (model) {
         },
         {
           strategies: [
-            '0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa', // mETH
-            '0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3', // OETH
+            '0x298aFB19A105D59E74658C4C334Ff360BadE6dd2', // mETH
+            '0xa4C637e0F704745D182e4D38cAb7E7485321d059', // OETH
             '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', // unkwown strategy
           ],
           shares: [parseEther('0.5'), parseEther('0.1'), parseEther('0.2')],
@@ -155,7 +155,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 9 : 7;
+      const right_clicks = model.letter === 'S' ? 12 : 10;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
