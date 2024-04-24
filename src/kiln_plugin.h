@@ -51,7 +51,7 @@ typedef enum {
     KILN_V2_CLAIM,
     KILN_LR_DEPOSIT_INTO_STRATEGY,
     KILN_LR_QUEUE_WITHDRAWALS,
-    KILN_LR_COMPLETE_QUEUED_WITHDRAWAL,
+    KILN_LR_COMPLETE_QUEUED_WITHDRAWALS,
     KILN_LR_DELEGATE_TO,
     KILN_LR_UNDELEGATE,
 } selector_t;
@@ -92,14 +92,43 @@ typedef enum {
     LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER
 } lr_queue_withdrawals_parameters;
 
-// Parameters for LR complete queued withdrawal selector.
+// Parameters for LR complete queued withdrawals selector.
 typedef enum {
-    LR_COMPLETE_QUEUED_WITHDRAWAL_QUEUEDWITHDRAWAL_OFFSET = 0,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_TOKENS_OFFSET,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_MIDDLEWARETIMEINDEX,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_RECEIVEASTOKENS,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_UNEXPECTED_PARAMETER
-} lr_complete_queued_withdrawal_parameters;
+    LRCQW_WITHDRAWALS_OFFSET = 0,
+    LRCQW_TOKENS_OFFSET,
+    LRCQW_MIDDLEWARE_TIMES_INDEXES_OFFSET,
+    LRCQW_RECEIVE_AS_TOKENS_OFFSET,
+
+    LRCQW_WITHDRAWALS_LENGTH,
+    LRCQW_WITHDRAWALS__OFFSET_ITEMS,
+
+    LRCQW_WITHDRAWALS__ITEM__STAKER,
+    LRCQW_WITHDRAWALS__ITEM__DELEGATED_TO,
+    LRCQW_WITHDRAWALS__ITEM__WITHDRAWER,
+    LRCQW_WITHDRAWALS__ITEM__NONCE,
+    LRCQW_WITHDRAWALS__ITEM__START_BLOCK,
+    LRCQW_WITHDRAWALS__ITEM__STRATEGIES_OFFSET,
+    LRCQW_WITHDRAWALS__ITEM__SHARES_OFFSET,
+    LRCQW_WITHDRAWALS__ITEM__STRATEGIES_LENGTH,
+    LRCQW_WITHDRAWALS__ITEM__STRATEGIES__ITEMS,
+    LRCQW_WITHDRAWALS__ITEM__SHARES_LENGTH,
+    LRCQW_WITHDRAWALS__ITEM__SHARES__ITEMS,
+
+    LRCQW_TOKENS_LENGTH,
+    LRCQW_TOKENS__OFFSET_ITEMS,
+
+    LRCQW_TOKENS__ITEM__LENGTH,
+    LRCQW_TOKENS__ITEM__ITEMS,
+
+    LRCQW_MIDDLEWARE_TIMES_INDEXES_LENGTH,
+    LRCQW_MIDDLEWARE_TIMES_INDEXES__ITEMS,
+
+    LRCQW_RECEIVE_AS_TOKENS_LENGTH,
+    LRCQW_RECEIVE_AS_TOKENS__ITEMS,
+
+    LRCQW_UNEXPECTED_PARAMETER
+
+} lr_complete_queued_withdrawals_parameters;
 
 // Parameters for LR delegate to selector.
 typedef enum {
@@ -126,12 +155,19 @@ typedef struct {
     uint8_t erc20_amount_to_display[INT256_LENGTH];
 } lr_deposit_t;
 
-#define UNKNOW_LR_STRATEGY 255
+typedef struct {
+    char operator_address[ADDRESS_STR_LEN];
+    bool is_kiln;
+} lr_delegate_to_t;
+
+#define UNKNOW_LR_STRATEGY                  255
+#define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
 
 typedef struct {
     //  -- utils
     uint16_t queued_withdrawals_count;
     uint16_t current_item_count;
+
     // -- display
     uint8_t strategies_count;
     char withdrawer[ADDRESS_STR_LEN];
@@ -142,27 +178,38 @@ typedef struct {
     //      LR_STRATEGIES_COUNT +~ a few potential unsupported
     //      strategies in the plugin. So * 3 should be a good enough buffer.
     // (ii) in practice there should not be more than (2 ** 8) - 2 known strategies
-    uint8_t strategies[LR_STRATEGIES_COUNT * 3];
+    uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
 } lr_queue_withdrawals_t;
 
 typedef struct {
-    uint16_t skip_offset;
-    bool go_to_offset;
-} lr_complete_queued_withdrawal_t;
+    // -- utils
+    uint16_t parent_item_count;
+    uint16_t current_item_count;
+    uint16_t relegations_count;
 
-typedef struct {
-    char operator_address[ADDRESS_STR_LEN];
-    bool is_kiln;
-} lr_delegate_to_t;
+    // -- display
+    uint16_t strategies_count;
+    char withdrawer[ADDRESS_STR_LEN];
+    // list of strategies indexes **INCREMENTED BY 1** to display in the UI
+    // 0 is reserved for end of array
+    // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // (i) in practice, we should not encounter more than
+    //      LR_STRATEGIES_COUNT +~ a few potential unsupported
+    //      strategies in the plugin. So * 3 should be a good enough buffer.
+    // (ii) in practice there should not be more than (2 ** 8) - 2 known strategies
+    uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
+    // follows the indexes of the strategies array in this structure
+    bool is_redelegated[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
+} lr_complete_queued_withdrawals_t;
 
 typedef struct context_t {
     uint8_t next_param;
 
     union {
-        lr_complete_queued_withdrawal_t lr_complete_queued_withdrawal;
         lr_deposit_t lr_deposit;
-        lr_queue_withdrawals_t lr_queue_withdrawals;
         lr_delegate_to_t lr_delegate_to;
+        lr_queue_withdrawals_t lr_queue_withdrawals;
+        lr_complete_queued_withdrawals_t lr_complete_queued_withdrawals;
     } param_data;
 
     selector_t selectorIndex;

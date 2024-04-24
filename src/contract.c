@@ -34,8 +34,8 @@ static const uint32_t KILN_LR_DEPOSIT_INTO_STRATEGY_SELECTOR = 0xe7a050aa;
 // --- cast sig "queueWithdrawals((address[],uint256[],address)[])"
 static const uint32_t KILN_LR_QUEUE_WITHDRAWALS_SELECTOR = 0x0dd8dd02;
 // --- cast sig
-// "completeQueuedWithdrawal((address[],uint256[],address,(address,uint96),uint32,address),address[],uint256,bool)"
-static const uint32_t KILN_LR_COMPLETE_QUEUED_WITHDRAWAL_SELECTOR = 0xf3be65d3;
+// "completeQueuedWithdrawals((address,address,address,uint256,uint32,address[],uint256[])[],address[][],uint256[],bool[])"
+static const uint32_t KILN_LR_COMPLETE_QUEUED_WITHDRAWALS_SELECTOR = 0x33404396;
 // --- cast sig "delegateTo(address,(bytes,uint256),bytes32)"
 static const uint32_t KILN_LR_DELEGATE_TO_SELECTOR = 0xeea9064b;
 // -- cast sig "undelegate(address)"
@@ -59,7 +59,7 @@ const uint32_t KILN_SELECTORS[NUM_SELECTORS] = {
     // LR
     KILN_LR_DEPOSIT_INTO_STRATEGY_SELECTOR,
     KILN_LR_QUEUE_WITHDRAWALS_SELECTOR,
-    KILN_LR_COMPLETE_QUEUED_WITHDRAWAL_SELECTOR,
+    KILN_LR_COMPLETE_QUEUED_WITHDRAWALS_SELECTOR,
     KILN_LR_DELEGATE_TO_SELECTOR,
     KILN_LR_UNDELEGATE_SELECTOR,
 };

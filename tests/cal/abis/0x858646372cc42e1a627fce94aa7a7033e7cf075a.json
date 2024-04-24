@@ -80,12 +80,34 @@
     {
         "inputs": [
             {
-                "internalType": "struct QueuedWithdrawal",
-                "name": "queuedWithdrawal",
-                "type": "tuple",
                 "components": [
                     {
-                        "internalType": "address[]",
+                        "internalType": "address",
+                        "name": "staker",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "delegatedTo",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "withdrawer",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "nonce",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "startBlock",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "contract IStrategy[]",
                         "name": "strategies",
                         "type": "address[]"
                     },
@@ -93,58 +115,29 @@
                         "internalType": "uint256[]",
                         "name": "shares",
                         "type": "uint256[]"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "depositor",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "struct WithdrawerAndNonce",
-                        "name": "withdrawerAndNonce",
-                        "type": "tuple",
-                        "components": [
-                            {
-                                "internalType": "address",
-                                "name": "withdrawer",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "uint96",
-                                "name": "nonce",
-                                "type": "uint96"
-                            }
-                        ]
-                    },
-                    {
-                        "internalType": "uint32",
-                        "name": "withdrawalStartBlock",
-                        "type": "uint32"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "delegatedAddress",
-                        "type": "address"
                     }
-                ]
+                ],
+                "internalType": "struct IDelegationManager.Withdrawal[]",
+                "name": "withdrawals",
+                "type": "tuple[]"
             },
             {
-                "internalType": "address[]",
+                "internalType": "contract IERC20[][]",
                 "name": "tokens",
-                "type": "address[]"
+                "type": "address[][]"
             },
             {
-                "internalType": "uint256",
-                "name": "middlewareTimesIndex",
-                "type": "uint256"
+                "internalType": "uint256[]",
+                "name": "middlewareTimesIndexes",
+                "type": "uint256[]"
             },
             {
-                "internalType": "bool",
+                "internalType": "bool[]",
                 "name": "receiveAsTokens",
-                "type": "bool"
+                "type": "bool[]"
             }
         ],
-        "name": "completeQueuedWithdrawal",
+        "name": "completeQueuedWithdrawals",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

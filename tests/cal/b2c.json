@@ -83,8 +83,8 @@
                     "method": "queueWithdrawals",
                     "plugin": "Kiln"
                 },
-                "0xf3be65d3": {
-                    "method": "completeQueuedWithdrawal",
+                "0x33404396": {
+                    "method": "completeQueuedWithdrawals",
                     "plugin": "Kiln"
                 }
             }

@@ -32,15 +32,24 @@ void handle_finalize(ethPluginFinalize_t *msg) {
                 msg->numScreens = 2;
                 // one screen per withdrawal
                 msg->numScreens += params->strategies_count;
-                PRINTF("--- Queue Withdrawals: %d\n", params->strategies_count);
+                PRINTF("NUMBER OF STRATEGIES TO DISPLAY: %d\n", params->strategies_count);
             }
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
         }
-        case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
-            msg->numScreens = 1;
+        case KILN_LR_COMPLETE_QUEUED_WITHDRAWALS: {
+            {
+                lr_complete_queued_withdrawals_t *params =
+                    &context->param_data.lr_complete_queued_withdrawals;
+                // function + withdrawer screens
+                msg->numScreens = 2;
+                // one screen per strategy
+                msg->numScreens += params->strategies_count;
+                PRINTF("NUMBER OF STRATEGIES TO DISPLAY: %d\n", params->strategies_count);
+            }
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
+        }
         case KILN_LR_DELEGATE_TO:
             msg->numScreens = 2;
             msg->result = ETH_PLUGIN_RESULT_OK;
