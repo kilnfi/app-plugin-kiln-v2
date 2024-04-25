@@ -1,3 +1,18 @@
+/*******************************************************************************
+ *
+ * ██╗  ██╗██╗██╗     ███╗   ██╗
+ * ██║ ██╔╝██║██║     ████╗  ██║
+ * █████╔╝ ██║██║     ██╔██╗ ██║
+ * ██╔═██╗ ██║██║     ██║╚██╗██║
+ * ██║  ██╗██║███████╗██║ ╚████║
+ * ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝
+ *
+ * Kiln Ethereum Ledger App
+ * (c) 2022-2024 Kiln
+ *
+ * contact@kiln.fi
+ ********************************************************************************/
+
 #include "kiln_plugin.h"
 
 // ONCHAIN V1 - Solo Staking
@@ -41,29 +56,6 @@ static const uint32_t KILN_LR_DELEGATE_TO_SELECTOR = 0xeea9064b;
 // -- cast sig "undelegate(address)"
 static const uint32_t KILN_LR_UNDELEGATE_SELECTOR = 0xda8be864;
 
-const uint32_t KILN_SELECTORS[NUM_SELECTORS] = {
-    // V1
-    KILN_V1_DEPOSIT_SELECTOR,
-    KILN_V1_WITHDRAW_SELECTOR,
-    KILN_V1_WITHDRAW_EL_SELECTOR,
-    KILN_V1_WITHDRAW_CL_SELECTOR,
-    KILN_V1_BATCH_WITHDRAW_SELECTOR,
-    KILN_V1_BATCH_WITHDRAW_EL_SELECTOR,
-    KILN_V1_BATCH_WITHDRAW_CL_SELECTOR,
-    KILN_V1_REQUEST_EXIT_SELECTOR,
-    // V2
-    KILN_V2_STAKE_SELECTOR,
-    KILN_V2_REQUEST_EXIT_SELECTOR,
-    KILN_V2_MULTICLAIM_SELECTOR,
-    KILN_V2_CLAIM_SELECTOR,
-    // LR
-    KILN_LR_DEPOSIT_INTO_STRATEGY_SELECTOR,
-    KILN_LR_QUEUE_WITHDRAWALS_SELECTOR,
-    KILN_LR_COMPLETE_QUEUED_WITHDRAWALS_SELECTOR,
-    KILN_LR_DELEGATE_TO_SELECTOR,
-    KILN_LR_UNDELEGATE_SELECTOR,
-};
-
 const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN] = {
     "0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc",  // cbETH
     "0x93c4b944D05dfe6df7645A86cd2206016c51564D",  // stETH
@@ -105,3 +97,27 @@ const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN] = {"cbETH",
                                                               "mETH"};
 
 const char lr_kiln_operator_address[ADDRESS_STR_LEN] = "0x1f8C8b1d78d01bCc42ebdd34Fae60181bD697662";
+
+// Array of all supported selectors.
+const uint32_t KILN_SELECTORS[NUM_SELECTORS] = {
+    // V1
+    KILN_V1_DEPOSIT_SELECTOR,
+    KILN_V1_WITHDRAW_SELECTOR,
+    KILN_V1_WITHDRAW_EL_SELECTOR,
+    KILN_V1_WITHDRAW_CL_SELECTOR,
+    KILN_V1_BATCH_WITHDRAW_SELECTOR,
+    KILN_V1_BATCH_WITHDRAW_EL_SELECTOR,
+    KILN_V1_BATCH_WITHDRAW_CL_SELECTOR,
+    KILN_V1_REQUEST_EXIT_SELECTOR,
+    // V2
+    KILN_V2_STAKE_SELECTOR,
+    KILN_V2_REQUEST_EXIT_SELECTOR,
+    KILN_V2_MULTICLAIM_SELECTOR,
+    KILN_V2_CLAIM_SELECTOR,
+    // EigenLayer
+    KILN_LR_DEPOSIT_INTO_STRATEGY_SELECTOR,
+    KILN_LR_QUEUE_WITHDRAWALS_SELECTOR,
+    KILN_LR_COMPLETE_QUEUED_WITHDRAWALS_SELECTOR,
+    KILN_LR_DELEGATE_TO_SELECTOR,
+    KILN_LR_UNDELEGATE_SELECTOR,
+};

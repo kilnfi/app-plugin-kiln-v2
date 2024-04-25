@@ -13,82 +13,75 @@
  * contact@kiln.fi
  ********************************************************************************/
 
-#include "kiln_plugin.h"
-#include "plugin_utils.h"
+#include "query_contract_ui.h"
 
-void handle_init_contract(ethPluginInitContract_t *msg) {
-    if (msg->interfaceVersion != ETH_PLUGIN_INTERFACE_VERSION_LATEST) {
-        msg->result = ETH_PLUGIN_RESULT_UNAVAILABLE;
-        return;
-    }
-
-    if (msg->pluginContextLength < sizeof(context_t)) {
-        PRINTF("Plugin parameters structure is bigger than allowed size\n");
-        msg->result = ETH_PLUGIN_RESULT_ERROR;
-        return;
-    }
-
+void handle_query_contract_ui(ethQueryContractUI_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
+    bool ret = false;
 
-    memset(context, 0, sizeof(*context));
-
-    size_t index;
-    if (!find_selector(U4BE(msg->selector, 0), KILN_SELECTORS, NUM_SELECTORS, &index)) {
-        PRINTF("Error: selector not found!\n");
-        msg->result = ETH_PLUGIN_RESULT_UNAVAILABLE;
-        return;
-    }
-    context->selectorIndex = index;
-    // check for overflow
-    if ((size_t) context->selectorIndex != index) {
-        PRINTF("Error: overflow detected on selector index!\n");
-        msg->result = ETH_PLUGIN_RESULT_ERROR;
-        return;
-    }
-
-    msg->result = ETH_PLUGIN_RESULT_OK;
+    memset(msg->title, 0, msg->titleLength);
+    memset(msg->msg, 0, msg->msgLength);
 
     switch (context->selectorIndex) {
         case KILN_V1_DEPOSIT:
+            ret = stake_ui(msg);
             break;
 
         case KILN_V1_WITHDRAW:
         case KILN_V1_WITHDRAW_EL:
         case KILN_V1_WITHDRAW_CL:
+            ret = withdraw_ui(msg, context);
             break;
 
         case KILN_V1_BATCH_WITHDRAW:
         case KILN_V1_BATCH_WITHDRAW_EL:
         case KILN_V1_BATCH_WITHDRAW_CL:
+            ret = batch_withdraw_ui(msg, context);
             break;
 
         case KILN_V1_REQUEST_EXIT:
+            ret = request_exit_ui(msg);
             break;
 
         case KILN_V2_STAKE:
+            ret = stake_in_pool_ui(msg);
+            break;
+
         case KILN_V2_REQUEST_EXIT:
+            ret = request_pooling_exit_ui(msg);
+            break;
+
         case KILN_V2_MULTICLAIM:
+            ret = multiclaim_ui(msg);
+            break;
+
         case KILN_V2_CLAIM:
+            ret = claim_ui(msg);
             break;
 
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
-            context->next_param = LR_DEPOSIT_INTO_STRATEGY_STRATEGY;
+            ret = deposit_into_stragey_ui(msg, context);
             break;
+
         case KILN_LR_QUEUE_WITHDRAWALS:
-            context->next_param = LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET;
+            ret = queue_withdrawals_ui(msg, context);
             break;
+
         case KILN_LR_COMPLETE_QUEUED_WITHDRAWALS:
-            context->next_param = LRCQW_WITHDRAWALS_OFFSET;
+            ret = complete_queued_withdrawals_ui(msg, context);
             break;
+
         case KILN_LR_DELEGATE_TO:
-            context->next_param = LR_DELEGATE_TO_OPERATOR;
+            ret = delegate_to_ui(msg, context);
             break;
+
         case KILN_LR_UNDELEGATE:
+            ret = undelegate_ui(msg);
             break;
 
         default:
-            PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);
-            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             break;
     }
+    msg->result = ret ? ETH_PLUGIN_RESULT_OK : ETH_PLUGIN_RESULT_ERROR;
 }

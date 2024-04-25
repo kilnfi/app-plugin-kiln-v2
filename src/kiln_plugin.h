@@ -1,11 +1,33 @@
+/*******************************************************************************
+ *
+ * ██╗  ██╗██╗██╗     ███╗   ██╗
+ * ██║ ██╔╝██║██║     ████╗  ██║
+ * █████╔╝ ██║██║     ██╔██╗ ██║
+ * ██╔═██╗ ██║██║     ██║╚██╗██║
+ * ██║  ██╗██║███████╗██║ ╚████║
+ * ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝
+ *
+ * Kiln Ethereum Ledger App
+ * (c) 2022-2024 Kiln
+ *
+ * contact@kiln.fi
+ ********************************************************************************/
+
 #pragma once
 
 #include <string.h>
 
 #include "eth_plugin_interface.h"
+#include <ctype.h>
 
-#define PLUGIN_NAME        "Kiln"
-#define VALIDATOR_KEY_SIZE 48
+#define PLUGIN_NAME "Kiln"
+
+// ADDRESS_STR_LEN is 0x + addr + \0
+#define ADDRESS_STR_LEN 43
+
+// ****************************************************************************
+// * SUPPORTED SELECTORS
+// ****************************************************************************
 
 // Available selectors:
 //
@@ -34,6 +56,7 @@
 // --- 16. undelegate(address)
 //
 #define NUM_SELECTORS 17
+extern const uint32_t KILN_SELECTORS[NUM_SELECTORS];
 
 // Selectors available (see mapping above).
 typedef enum {
@@ -56,20 +79,26 @@ typedef enum {
     KILN_LR_UNDELEGATE,
 } selector_t;
 
-extern const uint32_t KILN_SELECTORS[NUM_SELECTORS];
+// ****************************************************************************
+// * EIGENLAYER
+// ****************************************************************************
 
-// ADDRESS_STR_LEN is 0x + addr + \0
-#define ADDRESS_STR_LEN 43
+// globals
 
-// All supported ERC20 tokens have 18 decimals on mainnet.
-#define ERC20_DECIMALS 18
+#define LR_STRATEGIES_COUNT                 11
+#define UNKNOW_LR_STRATEGY                  255
+#define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
+#define ERC20_DECIMALS                      18
 
-// Parameters for deposit selector.
-typedef enum {
-    DEPOSIT_UNEXPECTED_PARAMETER,
-} deposit_parameters;
+extern const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
+extern const char lr_erc20_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
+extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
+extern const char lr_kiln_operator_address[ADDRESS_STR_LEN];
 
-// Parameters for LR deposit into strategy selector.
+// ****************************************************************************
+
+// Parameters and state machines for EigenLayer parsing
+
 typedef enum {
     LR_DEPOSIT_INTO_STRATEGY_STRATEGY = 0,
     LR_DEPOSIT_INTO_STRATEGY_TOKEN,
@@ -77,7 +106,6 @@ typedef enum {
     LR_DEPOSIT_INTO_STRATEGY_UNEXPECTED_PARAMETER,
 } lr_deposit_into_strategy_parameters;
 
-// Parameters for LR queue withdrawals selector.
 typedef enum {
     LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET = 0,
     LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH,
@@ -92,7 +120,6 @@ typedef enum {
     LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER
 } lr_queue_withdrawals_parameters;
 
-// Parameters for LR complete queued withdrawals selector.
 typedef enum {
     LRCQW_WITHDRAWALS_OFFSET = 0,
     LRCQW_TOKENS_OFFSET,
@@ -130,7 +157,6 @@ typedef enum {
 
 } lr_complete_queued_withdrawals_parameters;
 
-// Parameters for LR delegate to selector.
 typedef enum {
     LR_DELEGATE_TO_OPERATOR = 0,
     LR_DELEGATE_TO_SIGNATURE_OFFSET,
@@ -138,16 +164,9 @@ typedef enum {
     LR_DELEGATE_TO_UNEXPECTED_PARAMETER
 } lr_delegate_to_parameters;
 
-#define LR_STRATEGIES_COUNT 11
+// ****************************************************************************
 
-extern const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
-extern const char lr_erc20_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
-extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
-extern const char lr_kiln_operator_address[ADDRESS_STR_LEN];
-
-// max number of strategies / erc20 to display
-#define MAX_DISPLAY_COUNT 3
-#define SELECTOR_LENGTH   4
+// Parsing structures
 
 typedef struct {
     int strategy_to_display;
@@ -159,9 +178,6 @@ typedef struct {
     char operator_address[ADDRESS_STR_LEN];
     bool is_kiln;
 } lr_delegate_to_t;
-
-#define UNKNOW_LR_STRATEGY                  255
-#define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
 
 typedef struct {
     //  -- utils
@@ -201,6 +217,10 @@ typedef struct {
     // follows the indexes of the strategies array in this structure
     bool is_redelegated[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
 } lr_complete_queued_withdrawals_t;
+
+// ****************************************************************************
+// * SHARED PLUGIN CONTEXT MEMORY
+// ****************************************************************************
 
 typedef struct context_t {
     uint8_t next_param;

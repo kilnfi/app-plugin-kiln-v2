@@ -1,8 +1,22 @@
-#include "kiln_plugin.h"
-#include <ctype.h>
+/*******************************************************************************
+ *
+ * ██╗  ██╗██╗██╗     ███╗   ██╗
+ * ██║ ██╔╝██║██║     ████╗  ██║
+ * █████╔╝ ██║██║     ██╔██╗ ██║
+ * ██╔═██╗ ██║██║     ██║╚██╗██║
+ * ██║  ██╗██║███████╗██║ ╚████║
+ * ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝
+ *
+ * Kiln Ethereum Ledger App
+ * (c) 2022-2024 Kiln
+ *
+ * contact@kiln.fi
+ ********************************************************************************/
 
-/*
- * Compare two addresses
+#include "provide_parameter.h"
+
+/**
+ * @brief Compare two addresses
  *
  * @param a: first address
  * @param b: second address
@@ -18,8 +32,8 @@ bool compare_addresses(const char a[ADDRESS_STR_LEN], const char b[ADDRESS_STR_L
     return true;
 }
 
-/*
- * If address is a known erc20, update lr display context with its name
+/**
+ * @brief If address is a known erc20, update lr display context with its name
  * otherwise set it to unkwown (UNKNOW_LR_STRATEGY)
  *
  * @param address: address to compare
@@ -36,8 +50,8 @@ int find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
     return UNKNOW_LR_STRATEGY;
 }
 
-/*
- * If address is a known strategy, update lr display context with its name
+/**
+ * @brief If address is a known strategy, update lr display context with its name
  * otherwise set it to unkwown (UNKNOW_LR_STRATEGY)
  *
  * @param address: address to compare
@@ -54,8 +68,8 @@ int find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
     return UNKNOW_LR_STRATEGY;
 }
 
-/*
- * Handle the parameters for the depositIntoStrategy(strategy,erc20,amount)
+/**
+ * @brief Handle the parameters for the depositIntoStrategy(strategy,erc20,amount)
  * selector
  *
  * @param msg: message containing the parameter
@@ -96,6 +110,13 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
     msg->result = ETH_PLUGIN_RESULT_OK;
 }
 
+/**
+ * @brief Handle the parameters for the queueWithdrawals(queuedWithdrawals[]) selector
+ *
+ * @param msg: message containing the parameter
+ * @param context: context to update
+ *
+ */
 void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *context) {
     // queuedWithdrawals = (address strategies[],uint256 shares[],address withdrawer)
     // queueWithdrawals(queuedWithdrawals[])
@@ -243,6 +264,13 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
     msg->result = ETH_PLUGIN_RESULT_OK;
 }
 
+/**
+ * @brief Handle the parameters for the completeQueuedWithdrawals(Withdrawal[] withdrawals,
+ * address[][] tokens, uint256[] middlewareTimesIndexes, bool[] receiveAsTokens) selector
+ * @param msg: message containing the parameter
+ * @param context: context to update
+ *
+ */
 void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, context_t *context) {
     // **************************************************************************
     // FUNCTION TO PARSE
@@ -580,6 +608,13 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
     }
 }
 
+/**
+ * @brief Handle the parameters for the delegateTo(address,(bytes,uint256),bytes32) selector
+ *
+ * @param msg: message containing the parameter
+ * @param context: context to update
+ *
+ */
 void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context) {
     // delegateTo(address,(bytes,uint256),bytes32)
     // example
@@ -620,64 +655,4 @@ void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context)
             return;
     }
     msg->result = ETH_PLUGIN_RESULT_OK;
-}
-
-void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
-    context_t *context = (context_t *) msg->pluginContext;
-
-    PRINTF("plugin provide parameter: offset %d\nBytes: %.*H\n",
-           msg->parameterOffset,
-           PARAMETER_LENGTH,
-           msg->parameter);
-
-    switch (context->selectorIndex) {
-        case KILN_V1_DEPOSIT:
-            msg->result = ETH_PLUGIN_RESULT_ERROR;
-            break;
-
-        case KILN_V1_WITHDRAW:
-        case KILN_V1_WITHDRAW_EL:
-        case KILN_V1_WITHDRAW_CL:
-            msg->result = ETH_PLUGIN_RESULT_OK;
-            break;
-        case KILN_V1_BATCH_WITHDRAW:
-        case KILN_V1_BATCH_WITHDRAW_EL:
-        case KILN_V1_BATCH_WITHDRAW_CL:
-            msg->result = ETH_PLUGIN_RESULT_OK;
-            break;
-
-        case KILN_V1_REQUEST_EXIT:
-            msg->result = ETH_PLUGIN_RESULT_OK;
-            break;
-
-        case KILN_V2_STAKE:
-            msg->result = ETH_PLUGIN_RESULT_ERROR;
-            break;
-        case KILN_V2_REQUEST_EXIT:
-        case KILN_V2_MULTICLAIM:
-        case KILN_V2_CLAIM:
-            msg->result = ETH_PLUGIN_RESULT_OK;
-            break;
-
-        case KILN_LR_DEPOSIT_INTO_STRATEGY:
-            handle_lr_deposit_into_strategy(msg, context);
-            break;
-        case KILN_LR_QUEUE_WITHDRAWALS:
-            handle_lr_queue_withdrawals(msg, context);
-            break;
-        case KILN_LR_COMPLETE_QUEUED_WITHDRAWALS:
-            handle_lr_complete_queued_withdrawals(msg, context);
-            break;
-        case KILN_LR_DELEGATE_TO:
-            handle_lr_delegate_to(msg, context);
-            break;
-        case KILN_LR_UNDELEGATE:
-            msg->result = ETH_PLUGIN_RESULT_OK;
-            break;
-
-        default:
-            PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
-            msg->result = ETH_PLUGIN_RESULT_ERROR;
-            break;
-    }
 }
