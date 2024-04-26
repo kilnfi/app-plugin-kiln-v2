@@ -1,3 +1,18 @@
+/*******************************************************************************
+ *
+ * ██╗  ██╗██╗██╗     ███╗   ██╗
+ * ██║ ██╔╝██║██║     ████╗  ██║
+ * █████╔╝ ██║██║     ██╔██╗ ██║
+ * ██╔═██╗ ██║██║     ██║╚██╗██║
+ * ██║  ██╗██║███████╗██║ ╚████║
+ * ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝
+ *
+ * Kiln Ethereum Ledger App
+ * (c) 2022-2024 Kiln
+ *
+ * contact@kiln.fi
+ ********************************************************************************/
+
 #include "kiln_plugin.h"
 
 void handle_finalize(ethPluginFinalize_t *msg) {
@@ -25,11 +40,36 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             msg->numScreens = 3;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
-        case KILN_LR_QUEUE_WITHDRAWAL:
+        case KILN_LR_QUEUE_WITHDRAWALS: {
+            {
+                lr_queue_withdrawals_t *params = &context->param_data.lr_queue_withdrawals;
+                // function + withdrawer screens
+                msg->numScreens = 2;
+                // one screen per withdrawal
+                msg->numScreens += params->strategies_count;
+                PRINTF("NUMBER OF STRATEGIES TO DISPLAY: %d\n", params->strategies_count);
+            }
+            msg->result = ETH_PLUGIN_RESULT_OK;
+            break;
+        }
+        case KILN_LR_COMPLETE_QUEUED_WITHDRAWALS: {
+            {
+                lr_complete_queued_withdrawals_t *params =
+                    &context->param_data.lr_complete_queued_withdrawals;
+                // function + withdrawer screens
+                msg->numScreens = 2;
+                // one screen per strategy
+                msg->numScreens += params->strategies_count;
+                PRINTF("NUMBER OF STRATEGIES TO DISPLAY: %d\n", params->strategies_count);
+            }
+            msg->result = ETH_PLUGIN_RESULT_OK;
+            break;
+        }
+        case KILN_LR_DELEGATE_TO:
             msg->numScreens = 2;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
-        case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
+        case KILN_LR_UNDELEGATE:
             msg->numScreens = 1;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;

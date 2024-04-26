@@ -1,3 +1,18 @@
+/*******************************************************************************
+ *
+ * ██╗  ██╗██╗██╗     ███╗   ██╗
+ * ██║ ██╔╝██║██║     ████╗  ██║
+ * █████╔╝ ██║██║     ██╔██╗ ██║
+ * ██╔═██╗ ██║██║     ██║╚██╗██║
+ * ██║  ██╗██║███████╗██║ ╚████║
+ * ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝
+ *
+ * Kiln Ethereum Ledger App
+ * (c) 2022-2024 Kiln
+ *
+ * contact@kiln.fi
+ ********************************************************************************/
+
 #include "kiln_plugin.h"
 #include "plugin_utils.h"
 
@@ -59,11 +74,16 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
             context->next_param = LR_DEPOSIT_INTO_STRATEGY_STRATEGY;
             break;
-        case KILN_LR_QUEUE_WITHDRAWAL:
-            context->next_param = LR_QUEUE_WITHDRAWAL_STRATEGY_INDEXES_OFFSET;
+        case KILN_LR_QUEUE_WITHDRAWALS:
+            context->next_param = LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET;
             break;
-        case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
-            context->next_param = LR_COMPLETE_QUEUED_WITHDRAWAL_QUEUEDWITHDRAWAL_OFFSET;
+        case KILN_LR_COMPLETE_QUEUED_WITHDRAWALS:
+            context->next_param = LRCQW_WITHDRAWALS_OFFSET;
+            break;
+        case KILN_LR_DELEGATE_TO:
+            context->next_param = LR_DELEGATE_TO_OPERATOR;
+            break;
+        case KILN_LR_UNDELEGATE:
             break;
 
         default:

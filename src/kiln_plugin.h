@@ -1,11 +1,33 @@
+/*******************************************************************************
+ *
+ * ██╗  ██╗██╗██╗     ███╗   ██╗
+ * ██║ ██╔╝██║██║     ████╗  ██║
+ * █████╔╝ ██║██║     ██╔██╗ ██║
+ * ██╔═██╗ ██║██║     ██║╚██╗██║
+ * ██║  ██╗██║███████╗██║ ╚████║
+ * ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝
+ *
+ * Kiln Ethereum Ledger App
+ * (c) 2022-2024 Kiln
+ *
+ * contact@kiln.fi
+ ********************************************************************************/
+
 #pragma once
 
 #include <string.h>
 
 #include "eth_plugin_interface.h"
+#include <ctype.h>
 
-#define PLUGIN_NAME        "Kiln"
-#define VALIDATOR_KEY_SIZE 48
+#define PLUGIN_NAME "Kiln"
+
+// ADDRESS_STR_LEN is 0x + addr + \0
+#define ADDRESS_STR_LEN 43
+
+// ****************************************************************************
+// * SUPPORTED SELECTORS
+// ****************************************************************************
 
 // Available selectors:
 //
@@ -27,11 +49,14 @@
 //
 // LR selectors
 // --- 12. depositIntoStrategy(address,address,uint256)
-// --- 13. queueWithdrawal(uint256[],address[],uint256[],address,bool)
+// --- 13. queueWithdrawals((address[],uint256[],address)[])
 // --- 14.
 // completeQueuedWithdrawal((address,address,address,uint256,uint32,address[],uint256[]),address[],uint256,bool)
+// --- 15. delegateTo(address,(bytes,uint256),bytes32)
+// --- 16. undelegate(address)
 //
-#define NUM_SELECTORS 15
+#define NUM_SELECTORS 17
+extern const uint32_t KILN_SELECTORS[NUM_SELECTORS];
 
 // Selectors available (see mapping above).
 typedef enum {
@@ -48,24 +73,32 @@ typedef enum {
     KILN_V2_MULTICLAIM,
     KILN_V2_CLAIM,
     KILN_LR_DEPOSIT_INTO_STRATEGY,
-    KILN_LR_QUEUE_WITHDRAWAL,
-    KILN_LR_COMPLETE_QUEUED_WITHDRAWAL,
+    KILN_LR_QUEUE_WITHDRAWALS,
+    KILN_LR_COMPLETE_QUEUED_WITHDRAWALS,
+    KILN_LR_DELEGATE_TO,
+    KILN_LR_UNDELEGATE,
 } selector_t;
 
-extern const uint32_t KILN_SELECTORS[NUM_SELECTORS];
+// ****************************************************************************
+// * EIGENLAYER
+// ****************************************************************************
 
-// ADDRESS_STR_LEN is 0x + addr + \0
-#define ADDRESS_STR_LEN 43
+// globals
 
-// All supported ERC20 tokens have 18 decimals on mainnet.
-#define ERC20_DECIMALS 18
+#define LR_STRATEGIES_COUNT                 11
+#define UNKNOW_LR_STRATEGY                  255
+#define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
+#define ERC20_DECIMALS                      18
 
-// Parameters for deposit selector.
-typedef enum {
-    DEPOSIT_UNEXPECTED_PARAMETER,
-} deposit_parameters;
+extern const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
+extern const char lr_erc20_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
+extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
+extern const char lr_kiln_operator_address[ADDRESS_STR_LEN];
 
-// Parameters for LR deposit into strategy selector.
+// ****************************************************************************
+
+// Parameters and state machines for EigenLayer parsing
+
 typedef enum {
     LR_DEPOSIT_INTO_STRATEGY_STRATEGY = 0,
     LR_DEPOSIT_INTO_STRATEGY_TOKEN,
@@ -73,34 +106,67 @@ typedef enum {
     LR_DEPOSIT_INTO_STRATEGY_UNEXPECTED_PARAMETER,
 } lr_deposit_into_strategy_parameters;
 
-// Parameters for LR queue withdrawal selector.
 typedef enum {
-    LR_QUEUE_WITHDRAWAL_STRATEGY_INDEXES_OFFSET = 0,
-    LR_QUEUE_WITHDRAWAL_STRATEGIES_OFFSET,
-    LR_QUEUE_WITHDRAWAL_SHARES_OFFSET,
-    LR_QUEUE_WITHDRAWAL_WITHDRAWER,
-    LR_QUEUE_WITHDRAWAL_UNDELEGATEIFPOSSIBLE,
-    LR_QUEUE_WITHDRAWAL_UNEXPECTED_PARAMETER
-} lr_queue_withdrawal_parameters;
+    LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET = 0,
+    LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH,
+    LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__SHARES_ITEM,
+    LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER
+} lr_queue_withdrawals_parameters;
 
-// Parameters for LR complete queued withdrawal selector.
 typedef enum {
-    LR_COMPLETE_QUEUED_WITHDRAWAL_QUEUEDWITHDRAWAL_OFFSET = 0,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_TOKENS_OFFSET,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_MIDDLEWARETIMEINDEX,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_RECEIVEASTOKENS,
-    LR_COMPLETE_QUEUED_WITHDRAWAL_UNEXPECTED_PARAMETER
-} lr_complete_queued_withdrawal_parameters;
+    LRCQW_WITHDRAWALS_OFFSET = 0,
+    LRCQW_TOKENS_OFFSET,
+    LRCQW_MIDDLEWARE_TIMES_INDEXES_OFFSET,
+    LRCQW_RECEIVE_AS_TOKENS_OFFSET,
 
-#define LR_STRATEGIES_COUNT 11
+    LRCQW_WITHDRAWALS_LENGTH,
+    LRCQW_WITHDRAWALS__OFFSET_ITEMS,
 
-extern const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
-extern const char lr_erc20_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
-extern const char lr_tickers[LR_STRATEGIES_COUNT][MAX_TICKER_LEN];
+    LRCQW_WITHDRAWALS__ITEM__STAKER,
+    LRCQW_WITHDRAWALS__ITEM__DELEGATED_TO,
+    LRCQW_WITHDRAWALS__ITEM__WITHDRAWER,
+    LRCQW_WITHDRAWALS__ITEM__NONCE,
+    LRCQW_WITHDRAWALS__ITEM__START_BLOCK,
+    LRCQW_WITHDRAWALS__ITEM__STRATEGIES_OFFSET,
+    LRCQW_WITHDRAWALS__ITEM__SHARES_OFFSET,
+    LRCQW_WITHDRAWALS__ITEM__STRATEGIES_LENGTH,
+    LRCQW_WITHDRAWALS__ITEM__STRATEGIES__ITEMS,
+    LRCQW_WITHDRAWALS__ITEM__SHARES_LENGTH,
+    LRCQW_WITHDRAWALS__ITEM__SHARES__ITEMS,
 
-// max number of strategies / erc20 to display
-#define MAX_DISPLAY_COUNT 3
-#define SELECTOR_LENGTH   4
+    LRCQW_TOKENS_LENGTH,
+    LRCQW_TOKENS__OFFSET_ITEMS,
+
+    LRCQW_TOKENS__ITEM__LENGTH,
+    LRCQW_TOKENS__ITEM__ITEMS,
+
+    LRCQW_MIDDLEWARE_TIMES_INDEXES_LENGTH,
+    LRCQW_MIDDLEWARE_TIMES_INDEXES__ITEMS,
+
+    LRCQW_RECEIVE_AS_TOKENS_LENGTH,
+    LRCQW_RECEIVE_AS_TOKENS__ITEMS,
+
+    LRCQW_UNEXPECTED_PARAMETER
+
+} lr_complete_queued_withdrawals_parameters;
+
+typedef enum {
+    LR_DELEGATE_TO_OPERATOR = 0,
+    LR_DELEGATE_TO_SIGNATURE_OFFSET,
+    LR_DELEGATE_TO_APPROVER_SALT,
+    LR_DELEGATE_TO_UNEXPECTED_PARAMETER
+} lr_delegate_to_parameters;
+
+// ****************************************************************************
+
+// Parsing structures
 
 typedef struct {
     int strategy_to_display;
@@ -109,23 +175,61 @@ typedef struct {
 } lr_deposit_t;
 
 typedef struct {
-    uint16_t skip_offset;
-    bool go_to_offset;
-    char withdrawer[ADDRESS_STR_LEN];
-} lr_queue_withdrawal_t;
+    char operator_address[ADDRESS_STR_LEN];
+    bool is_kiln;
+} lr_delegate_to_t;
 
 typedef struct {
-    uint16_t skip_offset;
-    bool go_to_offset;
-} lr_complete_queued_withdrawal_t;
+    //  -- utils
+    uint16_t queued_withdrawals_count;
+    uint16_t current_item_count;
+
+    // -- display
+    uint8_t strategies_count;
+    char withdrawer[ADDRESS_STR_LEN];
+    // list of strategies indexes **INCREMENTED BY 1** to display in the UI
+    // 0 is reserved for end of array
+    // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // (i) in practice, we should not encounter more than
+    //      LR_STRATEGIES_COUNT +~ a few potential unsupported
+    //      strategies in the plugin. So * 3 should be a good enough buffer.
+    // (ii) in practice there should not be more than (2 ** 8) - 2 known strategies
+    uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
+} lr_queue_withdrawals_t;
+
+typedef struct {
+    // -- utils
+    uint16_t parent_item_count;
+    uint16_t current_item_count;
+    uint16_t relegations_count;
+
+    // -- display
+    uint16_t strategies_count;
+    char withdrawer[ADDRESS_STR_LEN];
+    // list of strategies indexes **INCREMENTED BY 1** to display in the UI
+    // 0 is reserved for end of array
+    // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // (i) in practice, we should not encounter more than
+    //      LR_STRATEGIES_COUNT +~ a few potential unsupported
+    //      strategies in the plugin. So * 3 should be a good enough buffer.
+    // (ii) in practice there should not be more than (2 ** 8) - 2 known strategies
+    uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
+    // follows the indexes of the strategies array in this structure
+    bool is_redelegated[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
+} lr_complete_queued_withdrawals_t;
+
+// ****************************************************************************
+// * SHARED PLUGIN CONTEXT MEMORY
+// ****************************************************************************
 
 typedef struct context_t {
     uint8_t next_param;
 
     union {
-        lr_complete_queued_withdrawal_t lr_complete_queued_withdrawal;
         lr_deposit_t lr_deposit;
-        lr_queue_withdrawal_t lr_queue_withdrawal;
+        lr_delegate_to_t lr_delegate_to;
+        lr_queue_withdrawals_t lr_queue_withdrawals;
+        lr_complete_queued_withdrawals_t lr_complete_queued_withdrawals;
     } param_data;
 
     selector_t selectorIndex;

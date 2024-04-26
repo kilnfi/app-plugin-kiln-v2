@@ -1,3 +1,18 @@
+/*******************************************************************************
+ *
+ * ██╗  ██╗██╗██╗     ███╗   ██╗
+ * ██║ ██╔╝██║██║     ████╗  ██║
+ * █████╔╝ ██║██║     ██╔██╗ ██║
+ * ██╔═██╗ ██║██║     ██║╚██╗██║
+ * ██║  ██╗██║███████╗██║ ╚████║
+ * ╚═╝  ╚═╝╚═╝╚══════╝╚═╝  ╚═══╝
+ *
+ * Kiln Ethereum Ledger App
+ * (c) 2022-2024 Kiln
+ *
+ * contact@kiln.fi
+ ********************************************************************************/
+
 #include "kiln_plugin.h"
 
 void handle_query_contract_id(ethQueryContractID_t *msg) {
@@ -48,12 +63,20 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
             strlcpy(msg->version, "Liquid Restaking", msg->versionLength);
             break;
 
-        case KILN_LR_QUEUE_WITHDRAWAL:
+        case KILN_LR_QUEUE_WITHDRAWALS:
             strlcpy(msg->version, "Liquid Restaking", msg->versionLength);
             break;
 
-        case KILN_LR_COMPLETE_QUEUED_WITHDRAWAL:
-            strlcpy(msg->version, "Liquid Restaking", msg->versionLength);
+        case KILN_LR_COMPLETE_QUEUED_WITHDRAWALS:
+            strlcpy(msg->version, "EigenLayer Claim Withdrawals", msg->versionLength);
+            break;
+
+        case KILN_LR_DELEGATE_TO:
+            strlcpy(msg->version, "EigenLayer Delegate", msg->versionLength);
+            break;
+
+        case KILN_LR_UNDELEGATE:
+            strlcpy(msg->version, "EigenLayer Undelegate", msg->versionLength);
             break;
 
         default:
