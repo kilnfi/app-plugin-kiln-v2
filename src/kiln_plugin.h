@@ -190,6 +190,7 @@ typedef struct {
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // 0 is reserved for end of array
     // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // assumptions:
     // (i) in practice, we should not encounter more than
     //      LR_STRATEGIES_COUNT +~ a few potential unsupported
     //      strategies in the plugin. So * 3 should be a good enough buffer.
@@ -201,19 +202,28 @@ typedef struct {
     // -- utils
     uint16_t parent_item_count;
     uint16_t current_item_count;
+    // -- total values
     uint16_t relegations_count;
+    uint8_t withdrawals_count;
+    uint16_t strategies_count;
 
     // -- display
-    uint16_t strategies_count;
     char withdrawer[ADDRESS_STR_LEN];
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // 0 is reserved for end of array
     // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // assumptions:
     // (i) in practice, we should not encounter more than
     //      LR_STRATEGIES_COUNT +~ a few potential unsupported
     //      strategies in the plugin. So * 3 should be a good enough buffer.
     // (ii) in practice there should not be more than (2 ** 8) - 2 known strategies
     uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
+    // follows the indexes of the strategies array in this structure.
+    // value is the withdrawal number
+    // assumptions:
+    // (i) in practice, we should not encounter more than
+    //      255 strategies in queued withdrawal calls
+    uint8_t withdrawals[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
     // follows the indexes of the strategies array in this structure
     bool is_redelegated[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
 } lr_complete_queued_withdrawals_t;

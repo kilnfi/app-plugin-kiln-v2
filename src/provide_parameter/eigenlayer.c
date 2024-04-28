@@ -40,7 +40,7 @@ bool compare_addresses(const char a[ADDRESS_STR_LEN], const char b[ADDRESS_STR_L
  *
  * @returns index of the erc20 in the context or UNKNOW_LR_STRATEGY if not found
  */
-int find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
+uint8_t find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_erc20_addresses[i])) {
             return i;
@@ -58,7 +58,7 @@ int find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
  *
  * @returns index of the strategy in the context or UNKNOW_LR_STRATEGY if not found
  */
-int find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
+uint8_t find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
         if (compare_addresses(address, lr_strategy_addresses[i])) {
             return i;
@@ -211,7 +211,7 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
                 char address_buffer[ADDRESS_STR_LEN];
                 getEthDisplayableAddress(buffer, address_buffer, sizeof(address_buffer), 0);
 
-                int strategy_index = find_lr_known_strategy(address_buffer);
+                uint8_t strategy_index = find_lr_known_strategy(address_buffer);
                 params->strategies[params->strategies_count] =
                     (strategy_index != UNKNOW_LR_STRATEGY) ? strategy_index + 1
                                                            : UNKNOW_LR_STRATEGY;
@@ -442,13 +442,16 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
                 char address_buffer[ADDRESS_STR_LEN];
                 getEthDisplayableAddress(buffer, address_buffer, sizeof(address_buffer), 0);
 
-                int strategy_index = find_lr_known_strategy(address_buffer);
+                uint8_t strategy_index = find_lr_known_strategy(address_buffer);
                 if (params->strategies_count < MAX_DISPLAYABLE_LR_STRATEGIES_COUNT) {
+                    params->withdrawals[params->strategies_count] = params->withdrawals_count;
+
                     params->strategies[params->strategies_count] =
                         (strategy_index != UNKNOW_LR_STRATEGY) ? strategy_index + 1
                                                                : UNKNOW_LR_STRATEGY;
 
-                    PRINTF("STRATEGY #: %d STRATEGY: %d\n",
+                    PRINTF("WITHDRAWAL #: %d STRATEGY #: %d STRATEGY: %d\n",
+                           params->parent_item_count,
                            params->strategies_count,
                            strategy_index);
                 }
@@ -470,6 +473,8 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
 
             if (params->current_item_count == 0 && params->parent_item_count > 0) {
                 // shares array is empty AND we have other queuedWithdrawals to parse
+                params->parent_item_count -= 1;
+                params->withdrawals_count += 1;
                 context->next_param = LRCQW_WITHDRAWALS__ITEM__STAKER;
             } else {
                 context->next_param = LRCQW_WITHDRAWALS__ITEM__SHARES__ITEMS;
@@ -483,6 +488,7 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
             if (params->current_item_count == 0) {
                 // we arrive at the end of the Withdrawal struct
                 params->parent_item_count -= 1;
+                params->withdrawals_count += 1;
                 if (params->parent_item_count == 0) {
                     // we arrive at the end of the Withdrawals array
                     context->next_param = LRCQW_TOKENS_LENGTH;
@@ -537,6 +543,7 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
             params->current_item_count -= 1;
             if (params->current_item_count == 0) {
                 // we arrive at the end of the tokens array
+                params->parent_item_count -= 1;
                 if (params->parent_item_count == 0) {
                     // if we don't have other Withdrawals to parse
                     context->next_param = LRCQW_MIDDLEWARE_TIMES_INDEXES_LENGTH;
@@ -590,8 +597,11 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
             {
                 uint16_t index = params->relegations_count - params->current_item_count;
 
+                uint16_t value;
+                U2BE_from_parameter(msg->parameter, &value);
                 // if false, token is redelegated
-                params->is_redelegated[index] = msg->parameter[0] == 0;
+                params->is_redelegated[index] = value == 0;
+                PRINTF("RECEIVE AS TOKENS #%d: %d\n", index, value);
             }
             params->current_item_count -= 1;
             if (params->current_item_count == 0) {

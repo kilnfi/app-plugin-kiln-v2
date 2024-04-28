@@ -88,7 +88,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 11 : 9;
+      const right_clicks = model.letter === 'S' ? 12 : 9;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
@@ -103,82 +103,6 @@ nano_models.forEach(function (model) {
 
   test(
     '[Nano ' + model.letter + '] LR Complete Queued Withdrawals Redelegate 1',
-    zemu(model, async (sim, eth) => {
-      const contract = new ethers.Contract(contractAddr, abi);
-      //
-      //  struct Withdrawal {
-      // 	    address staker;
-      // 	    address delegatedTo;
-      // 	    address withdrawer;
-      // 	    uint256 nonce;
-      // 	    uint32 startBlock;
-      // 	    address[] strategies;
-      // 	    uint256[] shares;
-      // }
-      //
-      // function completeQueuedWithdrawals(
-      // 	    Withdrawal[] calldata withdrawals,
-      // 	    address[][] calldata tokens,
-      // 	    uint256[] calldata middlewareTimesIndexes,
-      // 	    bool[] calldata receiveAsTokens
-      // ) external
-      //
-      const { data } =
-        await contract.populateTransaction.completeQueuedWithdrawals(
-          [
-            {
-              staker: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-              delegatedTo: '0x1f8C8b1d78d01bCc42ebdd34Fae60181bD697662',
-              withdrawer: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-              nonce: 0,
-              startBlock: 0,
-              strategies: [
-                '0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc', // cbETH
-              ],
-              shares: [parseEther('0.1')],
-            },
-          ],
-          [
-            [
-              '0xBe9895146f7AF43049ca1c1AE358B0541Ea49704', // cbETH
-            ],
-          ],
-          [0],
-          [true]
-        );
-
-      let unsignedTx = genericTx;
-
-      unsignedTx.to = contractAddr;
-      unsignedTx.data = data;
-      unsignedTx.value = parseEther('0');
-
-      const serializedTx = ethers.utils
-        .serializeTransaction(unsignedTx)
-        .slice(2);
-      const resolution = await ledgerService.resolveTransaction(
-        serializedTx,
-        eth.loadConfig,
-        {
-          externalPlugins: true,
-        }
-      );
-      const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 11 : 9;
-
-      await waitForAppScreen(sim);
-      await sim.navigateAndCompareSnapshots(
-        '.',
-        model.name + '_lrCompleteQueuedWithdrawals_redelegate_1',
-        [right_clicks, 0]
-      );
-      await tx;
-    }),
-    30000
-  );
-
-  test(
-    '[Nano ' + model.letter + '] LR Complete Queued Withdrawals 1',
     zemu(model, async (sim, eth) => {
       const contract = new ethers.Contract(contractAddr, abi);
       //
@@ -240,7 +164,83 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 11 : 9;
+      const right_clicks = model.letter === 'S' ? 9 : 6;
+
+      await waitForAppScreen(sim);
+      await sim.navigateAndCompareSnapshots(
+        '.',
+        model.name + '_lrCompleteQueuedWithdrawals_redelegate_1',
+        [right_clicks, 0]
+      );
+      await tx;
+    }),
+    30000
+  );
+
+  test(
+    '[Nano ' + model.letter + '] LR Complete Queued Withdrawals 1',
+    zemu(model, async (sim, eth) => {
+      const contract = new ethers.Contract(contractAddr, abi);
+      //
+      //  struct Withdrawal {
+      // 	    address staker;
+      // 	    address delegatedTo;
+      // 	    address withdrawer;
+      // 	    uint256 nonce;
+      // 	    uint32 startBlock;
+      // 	    address[] strategies;
+      // 	    uint256[] shares;
+      // }
+      //
+      // function completeQueuedWithdrawals(
+      // 	    Withdrawal[] calldata withdrawals,
+      // 	    address[][] calldata tokens,
+      // 	    uint256[] calldata middlewareTimesIndexes,
+      // 	    bool[] calldata receiveAsTokens
+      // ) external
+      //
+      const { data } =
+        await contract.populateTransaction.completeQueuedWithdrawals(
+          [
+            {
+              staker: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+              delegatedTo: '0x1f8C8b1d78d01bCc42ebdd34Fae60181bD697662',
+              withdrawer: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+              nonce: 0,
+              startBlock: 0,
+              strategies: [
+                '0x54945180dB7943c0ed0FEE7EdaB2Bd24620256bc', // cbETH
+              ],
+              shares: [parseEther('0.1')],
+            },
+          ],
+          [
+            [
+              '0xBe9895146f7AF43049ca1c1AE358B0541Ea49704', // cbETH
+            ],
+          ],
+          [0],
+          [true]
+        );
+
+      let unsignedTx = genericTx;
+
+      unsignedTx.to = contractAddr;
+      unsignedTx.data = data;
+      unsignedTx.value = parseEther('0');
+
+      const serializedTx = ethers.utils
+        .serializeTransaction(unsignedTx)
+        .slice(2);
+      const resolution = await ledgerService.resolveTransaction(
+        serializedTx,
+        eth.loadConfig,
+        {
+          externalPlugins: true,
+        }
+      );
+      const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
+      const right_clicks = model.letter === 'S' ? 9 : 6;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
@@ -339,7 +339,7 @@ nano_models.forEach(function (model) {
             ],
           ],
           [0, 0, 1],
-          [false, true, false]
+          [false, true, true, false, true, true, true, true]
         );
 
       let unsignedTx = genericTx;
@@ -359,12 +359,12 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 17 : 15;
+      const right_clicks = model.letter === 'S' ? 16 : 13;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
         '.',
-        model.name + '_lrCompleteQueuedWithdrawals_4',
+        model.name + '_lrCompleteQueuedWithdrawals_8',
         [right_clicks, 0]
       );
       await tx;

@@ -141,16 +141,18 @@ bool complete_queued_withdrawals_ui(ethQueryContractUI_t *msg, context_t *contex
             {
                 // removing the first screen to current screen index
                 // to get the index of the withdrawal
-                uint8_t withdrawal_index = msg->screenIndex - 2;
+                uint8_t strategy_index = msg->screenIndex - 2;
+                uint8_t withdrawal_index = params->withdrawals[strategy_index];
+                PRINTF("strat: %d || withdrawal_index: %d\n", strategy_index, withdrawal_index);
 
-                if (withdrawal_index < params->strategies_count) {
+                if (strategy_index < params->strategies_count) {
                     if (params->is_redelegated[withdrawal_index]) {
                         strlcpy(msg->title, "Redelegate", msg->titleLength);
                     } else {
                         strlcpy(msg->title, "Withdraw", msg->titleLength);
                     }
-                    uint8_t strategy = params->strategies[withdrawal_index];
 
+                    uint8_t strategy = params->strategies[strategy_index];
                     if (strategy == UNKNOW_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
                         strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
                     } else {

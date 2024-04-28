@@ -44,7 +44,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 8 : 6;
+      const right_clicks = model.letter === 'S' ? 9 : 7;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
@@ -54,7 +54,7 @@ nano_models.forEach(function (model) {
       );
       await tx;
     }),
-    30000
+    10000
   );
 
   test(
@@ -100,7 +100,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 12 : 10;
+      const right_clicks = model.letter === 'S' ? 13 : 11;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
@@ -109,7 +109,8 @@ nano_models.forEach(function (model) {
         [right_clicks, 0]
       );
       await tx;
-    })
+    }),
+    10000
   );
 
   test(
@@ -155,7 +156,7 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 12 : 10;
+      const right_clicks = model.letter === 'S' ? 13 : 11;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
@@ -164,6 +165,7 @@ nano_models.forEach(function (model) {
         [right_clicks, 0]
       );
       await tx;
-    })
+    }),
+    10000
   );
 });
