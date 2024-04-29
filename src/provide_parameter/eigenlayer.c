@@ -77,6 +77,23 @@ uint8_t find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
  *
  */
 void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t *context) {
+    // **************************************************************************
+    // FUNCTION TO PARSE
+    // **************************************************************************
+    //
+    // function depositIntoStrategy(
+    //    address strategy,
+    //    address erc20,
+    //    uint256 amount
+    // ) external
+    //
+    // **************************************************************************
+    // example
+    // [  0] selector
+    // [  4] strategy
+    // [ 36] erc20
+    // [ 68] amount
+
     uint8_t buffer[ADDRESS_LENGTH];
     char address_buffer[ADDRESS_STR_LEN];
 
@@ -118,15 +135,28 @@ void handle_lr_deposit_into_strategy(ethPluginProvideParameter_t *msg, context_t
  *
  */
 void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *context) {
-    // queuedWithdrawals = (address strategies[],uint256 shares[],address withdrawer)
-    // queueWithdrawals(queuedWithdrawals[])
+    // **************************************************************************
+    // FUNCTION TO PARSE
+    // **************************************************************************
+    //
+    // struct QueuedWithdrawalParams {
+    //      address[] strategies;
+    //      uint256[] shares;
+    //      address withdrawer;
+    // }
+    //
+    // function queueWithdrawals(
+    //    QueuedWithdrawalParams[] calldata queuedWithdrawalParams
+    // ) external
+    //
+    // **************************************************************************
     // example for 2 queue withdrawals with 2 strategies each (2x2 dimension)
     // [  0] selector
-    // [  4] queuedWithdrawals_offset
-    // [ 36] queuedWithdrawals_length
-    // [ 68] queuedWithdrawals_0_offset
-    // [100] queuedWithdrawals_1_offset
-    // [132] queuedWithdrawals_0
+    // [  4] QueuedWithdrawalParams_offset
+    // [ 36] QueuedWithdrawalParams_length
+    // [ 68] QueuedWithdrawalParams_0_offset
+    // [100] QueuedWithdrawalParams_1_offset
+    // [132] QueuedWithdrawalParams_0
     //        [132] strategies_offset
     //        [164] shares_offset
     //        [196] withdrawer
@@ -136,7 +166,7 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
     //        [324] shares_length
     //        [356] shares_0
     //        [388] shares_1
-    // [388] queuedWithdrawals_1
+    // [388] QueuedWithdrawalParams_1
     //        [388] strategies_offset
     //        [420] shares_offset
     //        [452] withdrawer
@@ -150,7 +180,9 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
     lr_queue_withdrawals_t *params = &context->param_data.lr_queue_withdrawals;
 
     switch (context->next_param) {
-        // 1. queuedWithdrawals array setup
+        // ********************************************************************
+        // QUEUEWITHDRAWALPARAMS[]
+        // ********************************************************************
         case LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET:
             context->next_param = LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH;
             break;
@@ -160,7 +192,9 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET;
             break;
 
-        // 2. entering a queuedWithdrawal
+        // ********************************************************************
+        // QUEUEWITHDRAWALPARAMS STRUCT
+        // ********************************************************************
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET:
             // we skip all the queuewithdrawal structs offsets
             PRINTF("CURRENT ITEM COUNT: %d\n", params->current_item_count);
@@ -626,7 +660,22 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
  *
  */
 void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context) {
-    // delegateTo(address,(bytes,uint256),bytes32)
+    // **************************************************************************
+    // FUNCTION TO PARSE
+    // **************************************************************************
+    //
+    // struct Signature {
+    //     bytes signature;
+    //     uint256 expiry;
+    // }
+    //
+    // function delegateTo(
+    //    address operator,
+    //    Signature signature,
+    //    bytes32 approverSalt
+    // ) external
+    //
+    // **************************************************************************
     // example
     // [0] selector
     // [4] operator
