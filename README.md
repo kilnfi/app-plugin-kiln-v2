@@ -142,7 +142,7 @@ The flow processed in [GitHub Actions](https://github.com/features/actions) is t
 
 ### LR Complete Queued Withdrawals
 
-![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00000.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00001.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00002.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00003.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00004.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00005.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00006.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00007.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00008.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00009.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/000010.png)
+![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00000.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00001.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00002.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00003.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00004.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00005.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00006.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00007.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00008.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00009.png) ![](/tests/snapshots/nanos_lrCompleteQueuedWithdrawals/00010.png)
 
 ## NANO X
 
