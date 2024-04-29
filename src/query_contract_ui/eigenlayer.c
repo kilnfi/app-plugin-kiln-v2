@@ -22,13 +22,13 @@
  * @param context: context with provide_parameter data
  *
  */
-bool deposit_into_stragey_ui(ethQueryContractUI_t *msg, context_t *context) {
+bool deposit_into_strategy_ui(ethQueryContractUI_t *msg, context_t *context) {
     bool ret = false;
     lr_deposit_t *params = &context->param_data.lr_deposit;
 
     switch (msg->screenIndex) {
         case 0:
-            strlcpy(msg->title, "EigenLayer", msg->titleLength);
+            strlcpy(msg->title, "Liquid Restaking", msg->titleLength);
             strlcpy(msg->msg, "Deposit In Strategy", msg->msgLength);
             ret = true;
             break;
@@ -127,7 +127,7 @@ bool complete_queued_withdrawals_ui(ethQueryContractUI_t *msg, context_t *contex
     switch (msg->screenIndex) {
         case 0:
             strlcpy(msg->title, "EigenLayer", msg->titleLength);
-            strlcpy(msg->msg, "Claim Withdrawals", msg->msgLength);
+            strlcpy(msg->msg, "Complete Withdrawals", msg->msgLength);
             ret = true;
             break;
 

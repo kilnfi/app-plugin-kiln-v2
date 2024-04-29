@@ -35,7 +35,7 @@ bool multiclaim_ui(ethQueryContractUI_t *msg);
 bool claim_ui(ethQueryContractUI_t *msg);
 
 // EigenLayer UI
-bool deposit_into_stragey_ui(ethQueryContractUI_t *msg, context_t *context);
+bool deposit_into_strategy_ui(ethQueryContractUI_t *msg, context_t *context);
 bool queue_withdrawals_ui(ethQueryContractUI_t *msg, context_t *context);
 bool complete_queued_withdrawals_ui(ethQueryContractUI_t *msg, context_t *context);
 bool delegate_to_ui(ethQueryContractUI_t *msg, context_t *context);

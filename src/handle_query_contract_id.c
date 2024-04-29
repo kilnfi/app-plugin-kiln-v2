@@ -36,11 +36,11 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
         case KILN_V1_BATCH_WITHDRAW:
         case KILN_V1_BATCH_WITHDRAW_EL:
         case KILN_V1_BATCH_WITHDRAW_CL:
-            strlcpy(msg->version, "Native Stakingn", msg->versionLength);
+            strlcpy(msg->version, "Native Staking", msg->versionLength);
             break;
 
         case KILN_V1_REQUEST_EXIT:
-            strlcpy(msg->version, "Native Stakingn", msg->versionLength);
+            strlcpy(msg->version, "Native Staking", msg->versionLength);
             break;
 
         case KILN_V2_STAKE:

@@ -60,7 +60,7 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
             break;
 
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
-            ret = deposit_into_stragey_ui(msg, context);
+            ret = deposit_into_strategy_ui(msg, context);
             break;
 
         case KILN_LR_QUEUE_WITHDRAWALS:
