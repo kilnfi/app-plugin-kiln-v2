@@ -632,6 +632,11 @@ void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context)
     // [4] operator
     // [36] signature_offset
     // [68] approver_salt
+    // [100] signature
+    //      [100] signature.signature.offset
+    //      [132] signature.expiry
+    //      [164] signature.signature.length
+    //      [192] signature.signature.items
 
     lr_delegate_to_t *params = &context->param_data.lr_delegate_to;
 
@@ -645,8 +650,8 @@ void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context)
                                          sizeof(params->operator_address),
                                          0);
 
-                params->is_kiln = false;
-                if (compare_addresses((const char *) buffer, lr_kiln_operator_address)) {
+                if (compare_addresses((const char *) params->operator_address,
+                                      lr_kiln_operator_address)) {
                     params->is_kiln = true;
                 }
             }
@@ -657,7 +662,31 @@ void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context)
             context->next_param = LR_DELEGATE_TO_APPROVER_SALT;
             break;
         case LR_DELEGATE_TO_APPROVER_SALT:
-            context->next_param = LR_DELEGATE_TO_UNEXPECTED_PARAMETER;
+            context->next_param = LR_DELEGATE_TO_SIGNATURE_SIG_OFFSET;
+            break;
+        case LR_DELEGATE_TO_SIGNATURE_SIG_OFFSET:
+            context->next_param = LR_DELEGATE_TO_SIGNATURE_EXPIRY;
+            break;
+        case LR_DELEGATE_TO_SIGNATURE_EXPIRY:
+            context->next_param = LR_DELEGATE_TO_SIGNATURE_SIG_LENGTH;
+            break;
+        case LR_DELEGATE_TO_SIGNATURE_SIG_LENGTH:
+            U2BE_from_parameter(msg->parameter, &params->current_item_count);
+            PRINTF("LR_DELEGATE_TO_SIGNATURE_SIG_LENGTH: %d\n", params->current_item_count);
+
+            if (params->current_item_count == 0) {
+                context->next_param = LR_DELEGATE_TO_UNEXPECTED_PARAMETER;
+            } else {
+                context->next_param = LR_DELEGATE_TO_SIGNATURE_SIG_ITEMS;
+            }
+            break;
+        case LR_DELEGATE_TO_SIGNATURE_SIG_ITEMS:
+            // we skip parsing signature items as they are not needed for clearsigning
+
+            params->current_item_count -= 1;
+            if (params->current_item_count == 0) {
+                context->next_param = LR_DELEGATE_TO_UNEXPECTED_PARAMETER;
+            }
             break;
         default:
             PRINTF("Param not supported: %d\n", context->next_param);

@@ -161,6 +161,10 @@ typedef enum {
     LR_DELEGATE_TO_OPERATOR = 0,
     LR_DELEGATE_TO_SIGNATURE_OFFSET,
     LR_DELEGATE_TO_APPROVER_SALT,
+    LR_DELEGATE_TO_SIGNATURE_SIG_OFFSET,
+    LR_DELEGATE_TO_SIGNATURE_EXPIRY,
+    LR_DELEGATE_TO_SIGNATURE_SIG_LENGTH,
+    LR_DELEGATE_TO_SIGNATURE_SIG_ITEMS,
     LR_DELEGATE_TO_UNEXPECTED_PARAMETER
 } lr_delegate_to_parameters;
 
@@ -175,6 +179,9 @@ typedef struct {
 } lr_deposit_t;
 
 typedef struct {
+    // -- utils
+    uint16_t current_item_count;
+    // -- display
     char operator_address[ADDRESS_STR_LEN];
     bool is_kiln;
 } lr_delegate_to_t;

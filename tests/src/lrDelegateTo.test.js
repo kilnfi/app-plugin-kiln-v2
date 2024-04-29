@@ -26,12 +26,12 @@ nano_models.forEach(function (model) {
       const contract = new ethers.Contract(contractAddr, abi);
 
       const { data } = await contract.populateTransaction.delegateTo(
-        '0x1f8c8b1d78d01bcc42ebdd34fae60181bd697662', // kiln operator
+        '0x1f8C8b1d78d01bCc42ebdd34Fae60181bD697662', // kiln operator
         {
-          signature: '0x',
-          expiry: 0,
+          signature: '0x1111111111111111',
+          expiry: 42424242,
         },
-        0
+        ethers.utils.formatBytes32String('salt')
       );
 
       let unsignedTx = genericTx;
@@ -51,14 +51,14 @@ nano_models.forEach(function (model) {
         }
       );
       const tx = eth.signTransaction("44'/60'/0'/0", serializedTx, resolution);
-      const right_clicks = model.letter === 'S' ? 7 : 5;
+      const right_clicks = model.letter === 'S' ? 5 : 5;
 
       await waitForAppScreen(sim);
       await sim.navigateAndCompareSnapshots(
         '.',
         model.name + '_delegate_to_is_kiln',
         [right_clicks, 0]
-      );    
+      );
       await tx;
     }),
     30000
@@ -72,10 +72,10 @@ nano_models.forEach(function (model) {
       const { data } = await contract.populateTransaction.delegateTo(
         '0x645a845f80576a25f1b412330a108780f6c4573d', // not kiln operator
         {
-          signature: '0x',
-          expiry: 0,
+          signature: '0x1111111111111111',
+          expiry: 42424242424242,
         },
-        0
+        ethers.utils.formatBytes32String('salt')
       );
 
       let unsignedTx = genericTx;
