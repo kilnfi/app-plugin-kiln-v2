@@ -213,16 +213,6 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER:
-            // EigenLayer contract does not allow withdrawer to be different than msg.sender
-            // https://github.com/Layr-Labs/eigenlayer-contracts/blob/7229f2b426b6f2a24c7795
-            // b1a4687a010eac8ef2/src/contracts/core/DelegationManager.sol#L275
-            // so we can only copy it once
-            if (params->withdrawer[0] == '\0') {
-                uint8_t buffer[ADDRESS_LENGTH];
-                copy_address(buffer, msg->parameter, sizeof(buffer));
-                getEthDisplayableAddress(buffer, params->withdrawer, sizeof(params->withdrawer), 0);
-            }
-            PRINTF("WITHDRAWER: %s\n", params->withdrawer);
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH:
@@ -434,15 +424,6 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
             context->next_param = LRCQW_WITHDRAWALS__ITEM__WITHDRAWER;
             break;
         case LRCQW_WITHDRAWALS__ITEM__WITHDRAWER:
-            // withdrawer is the same for all queuedWithdrawals
-            // so we only copy it once
-            if (params->withdrawer[0] == '\0') {
-                uint8_t buffer[ADDRESS_LENGTH];
-                copy_address(buffer, msg->parameter, sizeof(buffer));
-                getEthDisplayableAddress(buffer, params->withdrawer, sizeof(params->withdrawer), 0);
-            }
-            PRINTF("WITHDRAWER: %s\n", params->withdrawer);
-
             context->next_param = LRCQW_WITHDRAWALS__ITEM__NONCE;
             break;
         case LRCQW_WITHDRAWALS__ITEM__NONCE:

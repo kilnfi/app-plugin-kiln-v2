@@ -192,7 +192,6 @@ typedef struct {
 
     // -- display
     uint8_t strategies_count;
-    char withdrawer[ADDRESS_STR_LEN];
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // 0 is reserved for end of array
     // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
@@ -214,7 +213,6 @@ typedef struct {
     uint16_t strategies_count;
 
     // -- display
-    char withdrawer[ADDRESS_STR_LEN];
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // 0 is reserved for end of array
     // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy

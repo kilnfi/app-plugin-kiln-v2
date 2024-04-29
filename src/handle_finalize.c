@@ -48,8 +48,8 @@ void handle_finalize(ethPluginFinalize_t *msg) {
         case KILN_LR_QUEUE_WITHDRAWALS: {
             {
                 lr_queue_withdrawals_t *params = &context->param_data.lr_queue_withdrawals;
-                // function + withdrawer screens
-                msg->numScreens = 2;
+                // function screen
+                msg->numScreens = 1;
                 // one screen per withdrawal
                 msg->numScreens += params->strategies_count;
                 PRINTF("NUMBER OF STRATEGIES TO DISPLAY: %d\n", params->strategies_count);
@@ -61,8 +61,8 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             {
                 lr_complete_queued_withdrawals_t *params =
                     &context->param_data.lr_complete_queued_withdrawals;
-                // function + withdrawer screens
-                msg->numScreens = 2;
+                // function screen
+                msg->numScreens = 1;
                 // one screen per strategy
                 msg->numScreens += params->strategies_count;
                 PRINTF("NUMBER OF STRATEGIES TO DISPLAY: %d\n", params->strategies_count);
