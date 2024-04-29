@@ -126,6 +126,8 @@ The flow processed in [GitHub Actions](https://github.com/features/actions) is t
 
 ### LR Deposit Into Strategy
 
+![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00000.png) ![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00001.png) ![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00002.png) ![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00003.png) ![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00004.png) ![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00005.png) ![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00006.png) ![](/tests/snapshots/nanos_lrDepositIntoStrategyNormal/00007.png)
+
 ### Delegate To
 
 ![](/tests/snapshots/nanos_delegate_to_is_kiln/00000.png) ![](/tests/snapshots/nanos_delegate_to_is_kiln/00001.png) ![](/tests/snapshots/nanos_delegate_to_is_kiln/00002.png) ![](/tests/snapshots/nanos_delegate_to_is_kiln/00003.png) ![](/tests/snapshots/nanos_delegate_to_is_kiln/00004.png) ![](/tests/snapshots/nanos_delegate_to_is_kiln/00005.png) ![](/tests/snapshots/nanos_delegate_to_is_kiln/00006.png)
@@ -193,6 +195,8 @@ The flow processed in [GitHub Actions](https://github.com/features/actions) is t
 # EigenLayer
 
 ### LR Deposit Into Strategy
+
+![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00000.png) ![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00001.png) ![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00002.png) ![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00003.png) ![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00004.png) ![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00005.png) ![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00006.png) ![](/tests/snapshots/nanox_lrDepositIntoStrategyNormal/00007.png)
 
 ### Delegate To
 
