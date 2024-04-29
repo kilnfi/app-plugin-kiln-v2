@@ -53,7 +53,7 @@ static const uint32_t KILN_LR_QUEUE_WITHDRAWALS_SELECTOR = 0x0dd8dd02;
 static const uint32_t KILN_LR_COMPLETE_QUEUED_WITHDRAWALS_SELECTOR = 0x33404396;
 // --- cast sig "delegateTo(address,(bytes,uint256),bytes32)"
 static const uint32_t KILN_LR_DELEGATE_TO_SELECTOR = 0xeea9064b;
-// -- cast sig "undelegate(address)"
+// --- cast sig "undelegate(address)"
 static const uint32_t KILN_LR_UNDELEGATE_SELECTOR = 0xda8be864;
 
 const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN] = {

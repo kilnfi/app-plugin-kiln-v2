@@ -43,7 +43,7 @@
 //
 // V2 selectors
 // --- 8. stake()
-// --- 9. requestExit(shares_count)
+// --- 9. requestExit(shares_amount)
 // --- 10. multiClaim(exit_queues, ticket_ids, cask_ids)
 // --- 11. claim(uint256[],uint32[],uint16)
 //
@@ -86,6 +86,7 @@ typedef enum {
 // globals
 
 #define LR_STRATEGIES_COUNT                 11
+#define UNKNOW_LR_ERC20                     255
 #define UNKNOW_LR_STRATEGY                  255
 #define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
 #define ERC20_DECIMALS                      18
@@ -100,14 +101,15 @@ extern const char lr_kiln_operator_address[ADDRESS_STR_LEN];
 // Parameters and state machines for EigenLayer parsing
 
 typedef enum {
-    LR_DEPOSIT_INTO_STRATEGY_STRATEGY = 0,
+    LR_DEPOSIT_INTO_STRATEGY_UNEXPECTED_PARAMETER = 0,
+    LR_DEPOSIT_INTO_STRATEGY_STRATEGY,
     LR_DEPOSIT_INTO_STRATEGY_TOKEN,
     LR_DEPOSIT_INTO_STRATEGY_AMOUNT,
-    LR_DEPOSIT_INTO_STRATEGY_UNEXPECTED_PARAMETER,
 } lr_deposit_into_strategy_parameters;
 
 typedef enum {
-    LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET = 0,
+    LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER = 0,
+    LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET,
     LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH,
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET,
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET,
@@ -117,11 +119,11 @@ typedef enum {
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM,
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_LENGTH,
     LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__SHARES_ITEM,
-    LR_QUEUE_WITHDRAWALS_UNEXPECTED_PARAMETER
 } lr_queue_withdrawals_parameters;
 
 typedef enum {
-    LRCQW_WITHDRAWALS_OFFSET = 0,
+    LRCQW_UNEXPECTED_PARAMETER = 0,
+    LRCQW_WITHDRAWALS_OFFSET,
     LRCQW_TOKENS_OFFSET,
     LRCQW_MIDDLEWARE_TIMES_INDEXES_OFFSET,
     LRCQW_RECEIVE_AS_TOKENS_OFFSET,
@@ -152,20 +154,17 @@ typedef enum {
 
     LRCQW_RECEIVE_AS_TOKENS_LENGTH,
     LRCQW_RECEIVE_AS_TOKENS__ITEMS,
-
-    LRCQW_UNEXPECTED_PARAMETER
-
 } lr_complete_queued_withdrawals_parameters;
 
 typedef enum {
-    LR_DELEGATE_TO_OPERATOR = 0,
+    LR_DELEGATE_TO_UNEXPECTED_PARAMETER = 0,
+    LR_DELEGATE_TO_OPERATOR,
     LR_DELEGATE_TO_SIGNATURE_OFFSET,
     LR_DELEGATE_TO_APPROVER_SALT,
     LR_DELEGATE_TO_SIGNATURE_SIG_OFFSET,
     LR_DELEGATE_TO_SIGNATURE_EXPIRY,
     LR_DELEGATE_TO_SIGNATURE_SIG_LENGTH,
     LR_DELEGATE_TO_SIGNATURE_SIG_ITEMS,
-    LR_DELEGATE_TO_UNEXPECTED_PARAMETER
 } lr_delegate_to_parameters;
 
 // ****************************************************************************

@@ -47,7 +47,7 @@ bool deposit_into_strategy_ui(ethQueryContractUI_t *msg, context_t *context) {
             amountToString(params->erc20_amount_to_display,
                            sizeof(params->erc20_amount_to_display),
                            ERC20_DECIMALS,
-                           params->erc20_to_display == UNKNOW_LR_STRATEGY ||
+                           params->erc20_to_display == UNKNOW_LR_ERC20 ||
                                    params->erc20_to_display >= LR_STRATEGIES_COUNT
                                ? "UNKNOWN"
                                : lr_tickers[params->erc20_to_display],

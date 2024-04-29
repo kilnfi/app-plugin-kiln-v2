@@ -34,11 +34,11 @@ bool compare_addresses(const char a[ADDRESS_STR_LEN], const char b[ADDRESS_STR_L
 
 /**
  * @brief If address is a known erc20, update lr display context with its name
- * otherwise set it to unkwown (UNKNOW_LR_STRATEGY)
+ * otherwise set it to unkwown (UNKNOW_LR_ERC20)
  *
  * @param address: address to compare
  *
- * @returns index of the erc20 in the context or UNKNOW_LR_STRATEGY if not found
+ * @returns index of the erc20 in the context or UNKNOW_LR_ERC20 if not found
  */
 uint8_t find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
@@ -47,7 +47,7 @@ uint8_t find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
         }
     }
     // if unknown erc20, indicate it
-    return UNKNOW_LR_STRATEGY;
+    return UNKNOW_LR_ERC20;
 }
 
 /**

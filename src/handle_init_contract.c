@@ -44,18 +44,12 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
 
     switch (context->selectorIndex) {
         case KILN_V1_DEPOSIT:
-            break;
-
         case KILN_V1_WITHDRAW:
         case KILN_V1_WITHDRAW_EL:
         case KILN_V1_WITHDRAW_CL:
-            break;
-
         case KILN_V1_BATCH_WITHDRAW:
         case KILN_V1_BATCH_WITHDRAW_EL:
         case KILN_V1_BATCH_WITHDRAW_CL:
-            break;
-
         case KILN_V1_REQUEST_EXIT:
             break;
 

@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { parseEther } from 'ethers/lib/utils';
 import { ledgerService } from '@ledgerhq/hw-app-eth';
 
-const contractAddr = '0x858646372cc42e1a627fce94aa7a7033e7cf075a'; // delegation manager
+const contractAddr = '0x858646372cc42e1a627fce94aa7a7033e7cf075a'; // strategy manager
 
 const abi_path = `../cal/abis/${contractAddr}.json`;
 const abi = require(abi_path);
@@ -62,6 +62,10 @@ nano_models.forEach(function (model) {
             },
           ],
           [
+            [
+              '0xBe9895146f7AF43049ca1c1AE358B0541Ea49704', // cbETH
+              '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84', // stETH
+            ],
             [
               '0xBe9895146f7AF43049ca1c1AE358B0541Ea49704', // cbETH
               '0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84', // stETH

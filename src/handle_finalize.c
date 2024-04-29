@@ -29,6 +29,10 @@ void handle_finalize(ethPluginFinalize_t *msg) {
         case KILN_V1_BATCH_WITHDRAW_EL:
         case KILN_V1_BATCH_WITHDRAW_CL:
         case KILN_V1_REQUEST_EXIT:
+            msg->numScreens = 1;
+            msg->result = ETH_PLUGIN_RESULT_OK;
+            break;
+
         case KILN_V2_STAKE:
         case KILN_V2_REQUEST_EXIT:
         case KILN_V2_MULTICLAIM:
@@ -36,6 +40,7 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             msg->numScreens = 1;
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
+
         case KILN_LR_DEPOSIT_INTO_STRATEGY:
             msg->numScreens = 3;
             msg->result = ETH_PLUGIN_RESULT_OK;

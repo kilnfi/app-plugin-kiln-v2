@@ -26,7 +26,6 @@ nano_models.forEach(function (model) {
 
       const validatorAddress =
         '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-      const deadline = Number(1632843280);
 
       const { data } = await contract.populateTransaction.withdraw(
         validatorAddress
