@@ -2,7 +2,7 @@
     "chainId": 5,
     "contracts": [
         {
-            "address": "0xe8ff2a04837aac535199eecb5ece52b2735b3543",
+            "address": "0x1e68238ce926dec62b3fbc99ab06eb1d85ce0270",
             "contractName": "KilnStakingV1",
             "selectors": {
                 "0xd0e30db0": {
@@ -44,7 +44,7 @@
             }
         },
         {
-            "address": "0x380c7e0ec45f5b62ae5a0a6d6a0b95b532e3dd9c",
+            "address": "0x5db5235b5c7e247488784986e58019fffd98fda4",
             "contractName": "LedgerLiveV2",
             "selectors": {
                 "0x3a4b66f1": {
@@ -62,7 +62,7 @@
             }
         },
         {
-            "address": "0xb0c8078af582d8b754ef35f3bdaceff8587bd914",
+            "address": "0x8d6fd650500f82c7d978a440348e5a9b886943bf",
             "contractName": "KilnExitQueueV2",
             "selectors": {
                 "0xadcf1163": {
