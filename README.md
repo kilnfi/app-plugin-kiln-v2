@@ -112,8 +112,8 @@ Smart contracts covered by this plugin are:
 | Mainnet | Kiln On-Chain v1              | `0x1e68238ce926dec62b3fbc99ab06eb1d85ce0270` |
 | Mainnet | Kiln On-Chain v2 Native20     | `0x5db5235b5c7e247488784986e58019fffd98fda4` |
 | Mainnet | Kiln On-Chain v2 ExitQueue    | `0x8d6fd650500f82c7d978a440348e5a9b886943bf` |
-| Mainnet | EigenLayer Delegation Manager | `0x858646372cc42e1a627fce94aa7a7033e7cf075a` |
-| Mainnet | EigenLayer Strategy Manager   | `0x39053d51b77dc0d36036fc1fcc8cb819df8ef37a` |
+| Mainnet | EigenLayer Strategy Manager   | `0x858646372cc42e1a627fce94aa7a7033e7cf075a` |
+| Mainnet | EigenLayer Delegation Manager | `0x39053d51b77dc0d36036fc1fcc8cb819df8ef37a` |
 
 ## Clearsigning
 
@@ -195,7 +195,7 @@ Clearsigned:
 
 ## KILN ON-CHAIN v1 - Request Exits
 
-Function `requestExits(bytes validatorPubkeys)`
+Function `requestValidatorsExit(bytes validatorPubkeys)`
 Clearsigned:
 
 - none as validatorPubkeys can represent many BLS keys that we can't store on the device. Also only owner of the validator can request exit on its behalf so no attack vector possible.
@@ -266,20 +266,21 @@ Clearsigned:
 Function:
 
 ```solidity
-struct QueuedWithdrawalParams {
-    address[] strategies;
-    uint256[] shares;
-    address withdrawer;
+struct SignatureWithExpiry {
+    bytes signature;
+    uint256 expiry;
 }
 
-function queueWithdrawals(
-    QueuedWithdrawalParams[] queuedWithdrawalParams
+function delegateTo(
+    address operator,
+    SignatureWithExpiry memory approverSignatureAndExpiry,
+    bytes32 approverSalt
 )
 ```
 
 Clearsigned:
 
-- strategies: using mapping in `contracts.c`, they are either recognized or displayed as "UNKOWN"
+- operator: using mapping in `contracts.c`, it is either recognized or displayed as address
 
 Shares are confusing for users and would be hard to store properly on the device for display.
 
