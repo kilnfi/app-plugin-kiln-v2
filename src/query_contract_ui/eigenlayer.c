@@ -34,7 +34,7 @@ bool deposit_into_strategy_ui(ethQueryContractUI_t *msg, context_t *context) {
             break;
         case 1:
             strlcpy(msg->title, "Strategy", msg->titleLength);
-            if (params->strategy_to_display == UNKNOW_LR_STRATEGY ||
+            if (params->strategy_to_display == UNKNOWN_LR_STRATEGY ||
                 params->strategy_to_display >= LR_STRATEGIES_COUNT) {
                 strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
             } else {
@@ -47,7 +47,7 @@ bool deposit_into_strategy_ui(ethQueryContractUI_t *msg, context_t *context) {
             amountToString(params->erc20_amount_to_display,
                            sizeof(params->erc20_amount_to_display),
                            ERC20_DECIMALS,
-                           params->erc20_to_display == UNKNOW_LR_ERC20 ||
+                           params->erc20_to_display == UNKNOWN_LR_ERC20 ||
                                    params->erc20_to_display >= LR_STRATEGIES_COUNT
                                ? "UNKNOWN"
                                : lr_tickers[params->erc20_to_display],
@@ -90,7 +90,7 @@ bool queue_withdrawals_ui(ethQueryContractUI_t *msg, context_t *context) {
                     strlcpy(msg->title, "Strategy", msg->titleLength);
                     uint8_t strategy = params->strategies[withdrawal_index];
 
-                    if (strategy == UNKNOW_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
+                    if (strategy == UNKNOWN_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
                         strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
                     } else {
                         strlcpy(msg->msg, lr_tickers[strategy - 1], msg->msgLength);
@@ -141,7 +141,7 @@ bool complete_queued_withdrawals_ui(ethQueryContractUI_t *msg, context_t *contex
                     }
 
                     uint8_t strategy = params->strategies[strategy_index];
-                    if (strategy == UNKNOW_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
+                    if (strategy == UNKNOWN_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
                         strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
                     } else {
                         strlcpy(msg->msg, lr_tickers[strategy - 1], msg->msgLength);

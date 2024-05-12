@@ -86,8 +86,8 @@ typedef enum {
 // globals
 
 #define LR_STRATEGIES_COUNT                 11
-#define UNKNOW_LR_ERC20                     255
-#define UNKNOW_LR_STRATEGY                  255
+#define UNKNOWN_LR_ERC20                    255
+#define UNKNOWN_LR_STRATEGY                 255
 #define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
 #define ERC20_DECIMALS                      18
 
@@ -194,7 +194,7 @@ typedef struct {
     uint8_t strategies_count;
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // 0 is reserved for end of array
-    // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // UNKNOWN_LR_STRATEGY is used to display the "unknown" strategy
     // assumptions:
     // (i) in practice, we should not encounter more than
     //      LR_STRATEGIES_COUNT +~ a few potential unsupported
@@ -215,7 +215,7 @@ typedef struct {
     // -- display
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // 0 is reserved for end of array
-    // UNKNOW_LR_STRATEGY is used to display the "unknown" strategy
+    // UNKNOWN_LR_STRATEGY is used to display the "unknown" strategy
     // assumptions:
     // (i) in practice, we should not encounter more than
     //      LR_STRATEGIES_COUNT +~ a few potential unsupported

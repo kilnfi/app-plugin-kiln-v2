@@ -34,11 +34,11 @@ bool compare_addresses(const char a[ADDRESS_STR_LEN], const char b[ADDRESS_STR_L
 
 /**
  * @brief If address is a known erc20, update lr display context with its name
- * otherwise set it to unkwown (UNKNOW_LR_ERC20)
+ * otherwise set it to unkwown (UNKNOWN_LR_ERC20)
  *
  * @param address: address to compare
  *
- * @returns index of the erc20 in the context or UNKNOW_LR_ERC20 if not found
+ * @returns index of the erc20 in the context or UNKNOWN_LR_ERC20 if not found
  */
 uint8_t find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
@@ -47,16 +47,16 @@ uint8_t find_lr_known_erc20(const char address[ADDRESS_STR_LEN]) {
         }
     }
     // if unknown erc20, indicate it
-    return UNKNOW_LR_ERC20;
+    return UNKNOWN_LR_ERC20;
 }
 
 /**
  * @brief If address is a known strategy, update lr display context with its name
- * otherwise set it to unkwown (UNKNOW_LR_STRATEGY)
+ * otherwise set it to unkwown (UNKNOWN_LR_STRATEGY)
  *
  * @param address: address to compare
  *
- * @returns index of the strategy in the context or UNKNOW_LR_STRATEGY if not found
+ * @returns index of the strategy in the context or UNKNOWN_LR_STRATEGY if not found
  */
 uint8_t find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
     for (size_t i = 0; i < LR_STRATEGIES_COUNT; i++) {
@@ -65,7 +65,7 @@ uint8_t find_lr_known_strategy(const char address[ADDRESS_STR_LEN]) {
         }
     }
     // if unknown strategy, indicate it
-    return UNKNOW_LR_STRATEGY;
+    return UNKNOWN_LR_STRATEGY;
 }
 
 /**
@@ -237,8 +237,8 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
 
                 uint8_t strategy_index = find_lr_known_strategy(address_buffer);
                 params->strategies[params->strategies_count] =
-                    (strategy_index != UNKNOW_LR_STRATEGY) ? strategy_index + 1
-                                                           : UNKNOW_LR_STRATEGY;
+                    (strategy_index != UNKNOWN_LR_STRATEGY) ? strategy_index + 1
+                                                            : UNKNOWN_LR_STRATEGY;
 
                 PRINTF("STRATEGY #: %d STRATEGY: %d\n", params->strategies_count, strategy_index);
             }
@@ -462,8 +462,8 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
                     params->withdrawals[params->strategies_count] = params->withdrawals_count;
 
                     params->strategies[params->strategies_count] =
-                        (strategy_index != UNKNOW_LR_STRATEGY) ? strategy_index + 1
-                                                               : UNKNOW_LR_STRATEGY;
+                        (strategy_index != UNKNOWN_LR_STRATEGY) ? strategy_index + 1
+                                                                : UNKNOWN_LR_STRATEGY;
 
                     PRINTF("WITHDRAWAL #: %d STRATEGY #: %d STRATEGY: %d\n",
                            params->parent_item_count,
