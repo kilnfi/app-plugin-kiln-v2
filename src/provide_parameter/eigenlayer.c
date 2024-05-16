@@ -183,9 +183,18 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
         // ********************************************************************
         // QUEUEWITHDRAWALPARAMS[]
         // ********************************************************************
-        case LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET:
+        case LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_OFFSET: {
+            uint16_t offset;
+            U2BE_from_parameter(msg->parameter, &offset);
+            if (offset != PARAM_OFFSET) {
+                // valid offset should only skip this offset
+                PRINTF("Unexpected parameter offset\n");
+                msg->result = ETH_PLUGIN_RESULT_ERROR;
+                return;
+            }
             context->next_param = LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH;
             break;
+        }
         case LR_QUEUE_WITHDRAWALS_QWITHDRAWALS_LENGTH:
             U2BE_from_parameter(msg->parameter, &params->queued_withdrawals_count);
             params->current_item_count = params->queued_withdrawals_count;
@@ -195,7 +204,33 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
         // ********************************************************************
         // QUEUEWITHDRAWALPARAMS STRUCT
         // ********************************************************************
-        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET:
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRUCT_OFFSET: {
+            uint16_t offset;
+            U2BE_from_parameter(msg->parameter, &offset);
+
+            // We have limited size on the context and can't store all the offset values
+            // of the queuedWithdrawal structs. So we compute their checksum and expect to
+            // be able to recompute it using the offset of the parsed structures later.
+            // _preview will be equal to _value at the end of the parsing if everything is fine
+            checksum_offset_params_t h_params;
+            memset(&h_params, 0, sizeof(h_params));
+            memcpy(&h_params.prev_checksum,
+                   &(params->qwithdrawals_offsets_checksum_preview),
+                   sizeof(h_params.prev_checksum));
+
+            // we hash the previous checksum with the offset of the beginning of the structure.
+            // the offset we parse is actually after SELECTOR + the 2 above param so we add them to
+            // i the 2 above param so we add them to it.
+            h_params.new_offset = offset + SELECTOR_SIZE + PARAM_OFFSET * 2;
+
+            if (cx_keccak_256_hash((void *) &h_params,
+                                   sizeof(h_params),
+                                   params->qwithdrawals_offsets_checksum_preview) != CX_OK) {
+                PRINTF("unable to compute keccak hash\n");
+                msg->result = ETH_PLUGIN_RESULT_ERROR;
+                return;
+            }
+
             // we skip all the queuewithdrawal structs offsets
             PRINTF("CURRENT ITEM COUNT: %d\n", params->current_item_count);
             if (params->current_item_count > 0) {
@@ -206,19 +241,78 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
                 context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET;
             }
             break;
-        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET:
+        }
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_OFFSET: {
+            uint16_t offset;
+            U2BE_from_parameter(msg->parameter, &offset);
+            // here we are at the beginning of the queuedWithdrawal struct, so we want
+            // to compute the offset of the struct we're at for the queuedWithdrawal struct array
+            // offsets checksum
+
+            checksum_offset_params_t h_params;
+            memset(&h_params, 0, sizeof(h_params));
+            memcpy(&h_params.prev_checksum,
+                   &(params->qwithdrawals_offsets_checksum_value),
+                   sizeof(h_params.prev_checksum));
+            h_params.new_offset = msg->parameterOffset;
+
+            if (cx_keccak_256_hash((void *) &h_params,
+                                   sizeof(h_params),
+                                   params->qwithdrawals_offsets_checksum_value) != CX_OK) {
+                PRINTF("unable to compute keccak hash\n");
+                msg->result = ETH_PLUGIN_RESULT_ERROR;
+                return;
+            }
+
+            if (params->queued_withdrawals_count == 1) {
+                // if we are on the last item of the array of queuedWithdrawal struct
+                // we can check the checksum
+                if (memcmp(params->qwithdrawals_offsets_checksum_preview,
+                           params->qwithdrawals_offsets_checksum_value,
+                           sizeof(params->qwithdrawals_offsets_checksum_preview)) != 0) {
+                    PRINTF("Checksums do not match\n");
+                    msg->result = ETH_PLUGIN_RESULT_ERROR;
+                    return;
+                }
+            }
+
+            if (offset != PARAM_OFFSET * 3) {
+                // valid offset should only skip this + shares_offset + withdrawer
+                PRINTF("Unexpected parameter offset %d != %d\n", offset, PARAM_OFFSET * 3);
+                msg->result = ETH_PLUGIN_RESULT_ERROR;
+                return;
+            }
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET;
             break;
+        }
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_SHARES_OFFSET:
+            // we can only check this value once we know strategies array length
+            U2BE_from_parameter(msg->parameter, &params->shares_array_offset);
+
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
             break;
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER:
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH;
             break;
-        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH:
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH: {
             // get number of item to parse
             U2BE_from_parameter(msg->parameter, &params->current_item_count);
             PRINTF("STRATEGIES LENGTH: %d\n", params->current_item_count);
+
+            {  // check that the shares array offset is correct
+                // -- 1. we skip shares_offset + withdrawer + strategies_length
+                uint16_t should_be = PARAM_OFFSET * 3
+                                     // -- 2. we skip the strategies array length
+                                     + PARAM_OFFSET + PARAM_OFFSET * params->current_item_count;
+                ;
+                if (params->shares_array_offset != should_be) {
+                    PRINTF("Unexpected parameter offset %d != %d\n",
+                           params->shares_array_offset,
+                           should_be);
+                    msg->result = ETH_PLUGIN_RESULT_ERROR;
+                    return;
+                }
+            }
 
             if (params->current_item_count == 0) {
                 // if no strategies we go to the shares array
@@ -227,6 +321,7 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
                 context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM;
             }
             break;
+        }
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS__STRATEGIES_ITEM: {
             // get strategy we need to display
             {

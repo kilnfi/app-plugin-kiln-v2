@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "eth_plugin_interface.h"
+#include "cx.h"
 #include <ctype.h>
 
 #define PLUGIN_NAME "Kiln"
@@ -90,6 +91,7 @@ typedef enum {
 #define UNKNOWN_LR_STRATEGY                 255
 #define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
 #define ERC20_DECIMALS                      18
+#define PARAM_OFFSET                        32
 
 extern const char lr_strategy_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
 extern const char lr_erc20_addresses[LR_STRATEGIES_COUNT][ADDRESS_STR_LEN];
@@ -186,9 +188,17 @@ typedef struct {
 } lr_delegate_to_t;
 
 typedef struct {
+    uint8_t prev_checksum[CX_KECCAK_256_SIZE];
+    uint32_t new_offset;
+} checksum_offset_params_t;
+
+typedef struct {
     //  -- utils
     uint16_t queued_withdrawals_count;
     uint16_t current_item_count;
+    uint16_t shares_array_offset;
+    uint8_t qwithdrawals_offsets_checksum_preview[CX_KECCAK_256_SIZE];
+    uint8_t qwithdrawals_offsets_checksum_value[CX_KECCAK_256_SIZE];
 
     // -- display
     uint8_t strategies_count;
