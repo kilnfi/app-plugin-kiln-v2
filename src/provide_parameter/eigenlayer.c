@@ -783,31 +783,33 @@ void handle_lr_delegate_to(ethPluginProvideParameter_t *msg, context_t *context)
             context->next_param = LR_DELEGATE_TO_SIGNATURE_OFFSET;
             break;
         }
-        case LR_DELEGATE_TO_SIGNATURE_OFFSET:
+        case LR_DELEGATE_TO_SIGNATURE_OFFSET: {
             uint16_t offset;
             U2BE_from_parameter(msg->parameter, &offset);
-            if (offset != PARAM_OFFSET * 2) {
+            if (offset != PARAM_OFFSET * 3) {
                 // valid offset should only skip this offset + approver_salt
-                PRINTF("Unexpected parameter offset\n");
+                PRINTF("Unexpected parameter offset %d != %d\n", offset, PARAM_OFFSET * 3);
                 msg->result = ETH_PLUGIN_RESULT_ERROR;
                 return;
             }
             context->next_param = LR_DELEGATE_TO_APPROVER_SALT;
             break;
+        }
         case LR_DELEGATE_TO_APPROVER_SALT:
             context->next_param = LR_DELEGATE_TO_SIGNATURE_SIG_OFFSET;
             break;
-        case LR_DELEGATE_TO_SIGNATURE_SIG_OFFSET:
+        case LR_DELEGATE_TO_SIGNATURE_SIG_OFFSET: {
             uint16_t offset_sig;
             U2BE_from_parameter(msg->parameter, &offset_sig);
             if (offset_sig != PARAM_OFFSET * 2) {
                 // valid offset should only skip this offset + expiry
-                PRINTF("Unexpected parameter offset\n");
+                PRINTF("Unexpected parameter offset %d != %d\n", offset_sig, PARAM_OFFSET * 2);
                 msg->result = ETH_PLUGIN_RESULT_ERROR;
                 return;
             }
             context->next_param = LR_DELEGATE_TO_SIGNATURE_EXPIRY;
             break;
+        }
         case LR_DELEGATE_TO_SIGNATURE_EXPIRY:
             context->next_param = LR_DELEGATE_TO_SIGNATURE_SIG_LENGTH;
             break;

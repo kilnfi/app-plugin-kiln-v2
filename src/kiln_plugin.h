@@ -221,6 +221,11 @@ typedef struct {
     uint16_t relegations_count;
     uint8_t withdrawals_count;
     uint16_t strategies_count;
+    // -- offset verification
+    uint16_t tokens_offset;
+    uint16_t middlewareTimesIndexes_offset;
+    uint16_t receiveAsTokens_offset;
+    uint8_t withdrawals_offset[CX_KECCAK_256_SIZE];
 
     // -- display
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
@@ -245,6 +250,7 @@ typedef struct {
 // ****************************************************************************
 // * SHARED PLUGIN CONTEXT MEMORY
 // ****************************************************************************
+// [100] receiveAsTokens_offset
 
 typedef struct context_t {
     uint8_t next_param;
