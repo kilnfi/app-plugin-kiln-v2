@@ -652,23 +652,25 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
                 getEthDisplayableAddress(buffer, address_buffer, sizeof(address_buffer), 0);
 
                 uint8_t strategy_index = find_lr_known_strategy(address_buffer);
-                if (params->strategies_count < MAX_DISPLAYABLE_LR_STRATEGIES_COUNT) {
-                    uint8_t withdrawal = params->withdrawals_count;
-
-                    uint8_t strategy = (strategy_index != UNKNOWN_LR_STRATEGY)
-                                           ? strategy_index
-                                           : UNKNOWN_LR_STRATEGY;
-
-                    if (withdrawal > 16 || strategy > 16) {
-                        PRINTF("INVALID WITHDRAWAL #: %d STRATEGY #: %d\n", withdrawal, strategy);
-                        msg->result = ETH_PLUGIN_RESULT_ERROR;
-                        return;
-                    }
-
-                    params->strategies[params->strategies_count] =
-                        (withdrawal << 4) | (strategy & 0x0F);
-                    ;
+                if (params->strategies_count >= MAX_DISPLAYABLE_LR_STRATEGIES_COUNT) {
+                    PRINTF("Too many strategies to display, reverting\n");
+                    msg->result = ETH_PLUGIN_RESULT_ERROR;
+                    return;
                 }
+                uint8_t withdrawal = params->withdrawals_count;
+
+                uint8_t strategy =
+                    (strategy_index != UNKNOWN_LR_STRATEGY) ? strategy_index : UNKNOWN_LR_STRATEGY;
+
+                if (withdrawal > 16 || strategy > 16) {
+                    PRINTF("INVALID WITHDRAWAL #: %d STRATEGY #: %d\n", withdrawal, strategy);
+                    msg->result = ETH_PLUGIN_RESULT_ERROR;
+                    return;
+                }
+
+                params->strategies[params->strategies_count] =
+                    (withdrawal << 4) | (strategy & 0x0F);
+                ;
             }
 
             // we just processed one strategy item
