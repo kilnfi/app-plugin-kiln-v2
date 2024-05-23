@@ -201,6 +201,7 @@ typedef struct {
     uint8_t qwithdrawals_offsets_checksum_value[CX_KECCAK_256_SIZE];
 
     // -- display
+    char withdrawer[ADDRESS_STR_LEN];
     uint8_t strategies_count;
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // 0 is reserved for end of array

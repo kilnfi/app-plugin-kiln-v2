@@ -80,20 +80,26 @@ bool queue_withdrawals_ui(ethQueryContractUI_t *msg, context_t *context) {
             ret = true;
             break;
 
+        case 1:
+            strlcpy(msg->title, "Withdrawer", msg->titleLength);
+            strlcpy(msg->msg, params->withdrawer, msg->msgLength);
+            ret = true;
+            break;
+
         default: {
             {
                 // removing the first screen to current screen index
                 // to get the index of the withdrawal
-                uint8_t withdrawal_index = msg->screenIndex - 1;
+                uint8_t withdrawal_index = msg->screenIndex - 2;
 
                 if (withdrawal_index < params->strategies_count) {
                     strlcpy(msg->title, "Strategy", msg->titleLength);
                     uint8_t strategy = params->strategies[withdrawal_index];
 
-                    if (strategy == UNKNOWN_LR_STRATEGY || strategy - 1 >= LR_STRATEGIES_COUNT) {
+                    if (strategy == UNKNOWN_LR_STRATEGY || strategy >= LR_STRATEGIES_COUNT) {
                         strlcpy(msg->msg, "UNKNOWN", msg->msgLength);
                     } else {
-                        strlcpy(msg->msg, lr_tickers[strategy - 1], msg->msgLength);
+                        strlcpy(msg->msg, lr_tickers[strategy], msg->msgLength);
                     }
                 }
 

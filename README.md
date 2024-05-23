@@ -318,6 +318,7 @@ function queueWithdrawals(
 Clearsigned:
 
 - strategies: using mapping in `contracts.c`, they are either recognized or displayed as "UNKOWN"
+- withdrawer
 
 Shares are confusing for users and would be hard to store properly on the device for display.
 

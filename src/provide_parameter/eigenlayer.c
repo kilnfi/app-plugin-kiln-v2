@@ -296,9 +296,26 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
 
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER;
             break;
-        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER:
+        case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_WITHDRAWER: {
+            {
+                uint8_t buffer[ADDRESS_LENGTH];
+                copy_address(buffer, msg->parameter, sizeof(buffer));
+                char address_buffer[ADDRESS_STR_LEN];
+                getEthDisplayableAddress(buffer, address_buffer, sizeof(address_buffer), 0);
+                // we only support same withdrawer accross all the withdrawals
+                if (params->withdrawer[0] == '\0') {
+                    memcpy(params->withdrawer, address_buffer, sizeof(params->withdrawer));
+                } else if (strcmp(params->withdrawer, address_buffer) != 0) {
+                    PRINTF("Unexpected withdrawer address, %s != expected %s\n",
+                           msg->parameter,
+                           params->withdrawer);
+                    msg->result = ETH_PLUGIN_RESULT_ERROR;
+                    return;
+                }
+            }
             context->next_param = LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH;
             break;
+        }
         case LR_QUEUE_WITHDRAWALS__QWITHDRAWALS_STRATEGIES_LENGTH: {
             // get number of item to parse
             U2BE_from_parameter(msg->parameter, &params->current_item_count);
@@ -337,8 +354,7 @@ void handle_lr_queue_withdrawals(ethPluginProvideParameter_t *msg, context_t *co
 
                 uint8_t strategy_index = find_lr_known_strategy(address_buffer);
                 params->strategies[params->strategies_count] =
-                    (strategy_index != UNKNOWN_LR_STRATEGY) ? strategy_index + 1
-                                                            : UNKNOWN_LR_STRATEGY;
+                    (strategy_index != UNKNOWN_LR_STRATEGY) ? strategy_index : UNKNOWN_LR_STRATEGY;
 
                 PRINTF("STRATEGY #: %d STRATEGY: %d\n", params->strategies_count, strategy_index);
             }
