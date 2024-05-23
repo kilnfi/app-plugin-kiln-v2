@@ -754,6 +754,14 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
             }
 
             U2BE_from_parameter(msg->parameter, &params->parent_item_count);
+            if (params->parent_item_count > params->withdrawals_count) {
+                PRINTF("Unexpected number of tokens, %d > withdrawals %d\n",
+                       params->parent_item_count,
+                       params->withdrawals_count);
+                msg->result = ETH_PLUGIN_RESULT_ERROR;
+                return;
+            }
+
             params->current_item_count = params->parent_item_count;
             PRINTF("LRCQW_TOKENS_LENGTH: %d\n", params->parent_item_count);
 
@@ -891,6 +899,13 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
             }
 
             U2BE_from_parameter(msg->parameter, &params->current_item_count);
+            if (params->current_item_count > params->withdrawals_count) {
+                PRINTF("Unexpected middlewareTimesIndexes parameter length %d > withdrawals %d\n",
+                       params->current_item_count,
+                       msg->parameterOffset);
+                msg->result = ETH_PLUGIN_RESULT_ERROR;
+                return;
+            }
             PRINTF("LRCQW_MIDDLEWARE_TIMES_INDEXES_LENGTH: %d\n", params->current_item_count);
 
             if (params->current_item_count == 0) {
@@ -921,6 +936,13 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
             }
 
             U2BE_from_parameter(msg->parameter, &params->current_item_count);
+            if (params->current_item_count > params->withdrawals_count) {
+                PRINTF("Unexpected receiveAsTokens length %d > withdrawals length %d\n",
+                       params->current_item_count,
+                       params->withdrawals_count);
+                msg->result = ETH_PLUGIN_RESULT_ERROR;
+                return;
+            }
             // we save the number of redelegations to parse
             params->relegations_count = params->current_item_count;
             PRINTF("LRCQW_RECEIVE_AS_TOKENS_LENGTH: %d\n", params->current_item_count);

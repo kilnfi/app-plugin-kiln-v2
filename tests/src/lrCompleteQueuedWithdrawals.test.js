@@ -343,7 +343,7 @@ nano_models.forEach(function (model) {
             ],
           ],
           [0, 0, 1],
-          [false, true, true, false, true, true, true, true]
+          [false, true, true]
         );
 
       let unsignedTx = genericTx;
