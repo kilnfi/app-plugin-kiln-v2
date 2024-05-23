@@ -88,7 +88,7 @@ typedef enum {
 
 #define LR_STRATEGIES_COUNT                 11
 #define UNKNOWN_LR_ERC20                    255
-#define UNKNOWN_LR_STRATEGY                 255
+#define UNKNOWN_LR_STRATEGY                 15  // must be > LR_STRATEGIES_COUNT < 16
 #define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
 #define ERC20_DECIMALS                      18
 #define PARAM_OFFSET                        32
@@ -225,25 +225,20 @@ typedef struct {
     uint16_t tokens_offset;
     uint16_t middlewareTimesIndexes_offset;
     uint16_t receiveAsTokens_offset;
-    uint8_t withdrawals_offset[CX_KECCAK_256_SIZE];
+    uint16_t cached_offset;
+    uint8_t withdrawals_offsets_checksum_preview[CX_KECCAK_256_SIZE];
+    uint8_t withdrawals_offsets_checksum_value[CX_KECCAK_256_SIZE];
 
     // -- display
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
-    // 0 is reserved for end of array
     // UNKNOWN_LR_STRATEGY is used to display the "unknown" strategy
     // assumptions:
     // (i) in practice, we should not encounter more than
     //      LR_STRATEGIES_COUNT +~ a few potential unsupported
     //      strategies in the plugin. So * 3 should be a good enough buffer.
-    // (ii) in practice there should not be more than (2 ** 8) - 2 known strategies
+    // (ii) in practice there should not be more than (2 ** 4) - 2 known strategies
+    // (iii) the first 4 bytes are the withdrawal index, the next 4 bytes are the strategy index
     uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
-    // follows the indexes of the strategies array in this structure.
-    // value is the withdrawal number
-    // assumptions:
-    // (i) in practice, we should not encounter more than
-    //      255 strategies in queued withdrawal calls
-    uint8_t withdrawals[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
-    // follows the indexes of the strategies array in this structure
     bool is_redelegated[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
 } lr_complete_queued_withdrawals_t;
 
