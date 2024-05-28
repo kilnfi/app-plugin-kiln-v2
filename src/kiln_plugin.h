@@ -89,7 +89,7 @@ typedef enum {
 #define LR_STRATEGIES_COUNT                 11
 #define UNKNOWN_LR_ERC20                    15  // must be > LR_STRATEGIES_COUNT < 16
 #define UNKNOWN_LR_STRATEGY                 15  // must be > LR_STRATEGIES_COUNT < 16
-#define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
+#define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT 32  // must be > LR_STRATEGIES_COUNT
 #define ERC20_DECIMALS                      18
 #define PARAM_OFFSET                        32
 
@@ -214,6 +214,11 @@ typedef struct {
     uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
 } lr_queue_withdrawals_t;
 
+// must be size of MAX_DISPLAYABLE_LR_STRATEGIES_COUNT
+typedef struct {
+    uint32_t bits;
+} bitfield;
+
 typedef struct {
     // -- utils
     uint16_t parent_item_count;
@@ -232,6 +237,7 @@ typedef struct {
     uint8_t withdrawals_offsets_checksum_value[CX_KECCAK_256_SIZE];
 
     // -- display
+    uint8_t withdrawer[ADDRESS_LENGTH];
     // list of strategies indexes **INCREMENTED BY 1** to display in the UI
     // UNKNOWN_LR_STRATEGY is used to display the "unknown" strategy
     // assumptions:
@@ -241,7 +247,8 @@ typedef struct {
     // (ii) in practice there should not be more than (2 ** 4) - 2 known strategies
     // (iii) the first 4 bytes are the withdrawal index, the next 4 bytes are the strategy index
     uint8_t strategies[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
-    bool is_redelegated[MAX_DISPLAYABLE_LR_STRATEGIES_COUNT];
+    // follows the strategies array indexes
+    bitfield is_redelegated;
 } lr_complete_queued_withdrawals_t;
 
 // ****************************************************************************

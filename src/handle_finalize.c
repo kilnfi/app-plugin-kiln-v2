@@ -61,8 +61,8 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             {
                 lr_complete_queued_withdrawals_t *params =
                     &context->param_data.lr_complete_queued_withdrawals;
-                // function screen
-                msg->numScreens = 1;
+                // function screen + withdrawer
+                msg->numScreens = 2;
                 // one screen per strategy
                 msg->numScreens += params->strategies_count;
                 PRINTF("NUMBER OF STRATEGIES TO DISPLAY: %d\n", params->strategies_count);

@@ -16,6 +16,21 @@
 #include "query_contract_ui.h"
 
 /**
+ * @brief Get the bit at the given index
+ *
+ * @param bf: Bitfield to get the bit from
+ * @param index: Index of the bit to get
+ *
+ * @return int: The bit at the given index
+ */
+int get_bit(const bitfield *bf, int index) {
+    if (index < 0 || index >= MAX_DISPLAYABLE_LR_STRATEGIES_COUNT) {
+        return -1;  // Index out of range
+    }
+    return (bf->bits & (1U << index)) != 0;
+}
+
+/**
  * @brief UI for depositing into an EigenLayer strategy
  *
  * @param msg: message containing the parameter
@@ -131,16 +146,24 @@ bool complete_queued_withdrawals_ui(ethQueryContractUI_t *msg, context_t *contex
             ret = true;
             break;
 
+        case 1:
+            strlcpy(msg->title, "Withdrawer", msg->titleLength);
+            char address_buffer[ADDRESS_STR_LEN];
+            getEthDisplayableAddress(params->withdrawer, address_buffer, sizeof(address_buffer), 0);
+            strlcpy(msg->msg, address_buffer, msg->msgLength);
+            ret = true;
+            break;
+
         default: {
             {
-                // removing the first screen to current screen index
+                // removing the 2 known screens to current screen index
                 // to get the index of the withdrawal
-                uint8_t strategy_index = msg->screenIndex - 1;
+                uint8_t strategy_index = msg->screenIndex - 2;
 
                 if (strategy_index < params->strategies_count) {
                     uint8_t withdrawal_index = (params->strategies[strategy_index] >> 4) & 0x0F;
 
-                    if (params->is_redelegated[withdrawal_index]) {
+                    if (get_bit(&params->is_redelegated, withdrawal_index) == 1) {
                         strlcpy(msg->title, "Redelegate", msg->titleLength);
                     } else {
                         strlcpy(msg->title, "Withdraw", msg->titleLength);

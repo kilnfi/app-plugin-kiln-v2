@@ -16,6 +16,25 @@
 #include "provide_parameter.h"
 
 /**
+ * @brief Set a bit in a bitfield
+ *
+ * @param bf: bitfield to update
+ * @param index: index of the bit to update
+ * @param value: value to set the bit to (0 or 1)
+ *
+ */
+void set_bit(bitfield *bf, int index, bool value) {
+    if (index < 0 || index >= MAX_DISPLAYABLE_LR_STRATEGIES_COUNT) {
+        return;  // Index out of range
+    }
+    if (value) {
+        bf->bits |= (1U << index);
+    } else {
+        bf->bits &= ~(1U << index);
+    }
+}
+
+/**
  * @brief Compare two addresses
  *
  * @param a: first address
@@ -613,9 +632,25 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
         case LRCQW_WITHDRAWALS__ITEM__DELEGATED_TO:
             context->next_param = LRCQW_WITHDRAWALS__ITEM__WITHDRAWER;
             break;
-        case LRCQW_WITHDRAWALS__ITEM__WITHDRAWER:
+        case LRCQW_WITHDRAWALS__ITEM__WITHDRAWER: {
+            {
+                uint8_t buffer[ADDRESS_LENGTH];
+                copy_address(buffer, msg->parameter, sizeof(buffer));
+                // we only support same withdrawer accross all the withdrawals
+                if (params->withdrawer[0] == '\0') {
+                    memcpy(params->withdrawer, buffer, sizeof(params->withdrawer));
+                } else if (strcmp((const char *) params->withdrawer, (const char *) buffer) != 0) {
+                    PRINTF("Unexpected withdrawer address, %s != expected %s\n",
+                           msg->parameter,
+                           params->withdrawer);
+                    msg->result = ETH_PLUGIN_RESULT_ERROR;
+                    return;
+                }
+            }
+
             context->next_param = LRCQW_WITHDRAWALS__ITEM__NONCE;
             break;
+        }
         case LRCQW_WITHDRAWALS__ITEM__NONCE:
             context->next_param = LRCQW_WITHDRAWALS__ITEM__START_BLOCK;
             break;
@@ -982,7 +1017,7 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
                 uint16_t value;
                 U2BE_from_parameter(msg->parameter, &value);
                 // if false, token is redelegated
-                params->is_redelegated[index] = value == 0;
+                set_bit(&(params->is_redelegated), index, value == 0);
                 PRINTF("RECEIVE AS TOKENS #%d: %d\n", index, value);
             }
             params->current_item_count -= 1;
