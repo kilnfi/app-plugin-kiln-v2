@@ -193,7 +193,7 @@ Clearsigned:
 
 ![](/tests/snapshots/nanox_batchWithdrawCL/00000.png) ![](/tests/snapshots/nanox_batchWithdrawCL/00001.png) ![](/tests/snapshots/nanox_batchWithdrawCL/00002.png) ![](/tests/snapshots/nanox_batchWithdrawCL/00003.png) ![](/tests/snapshots/nanox_batchWithdrawCL/00004.png) ![](/tests/snapshots/nanox_batchWithdrawCL/00005.png)
 
-## KILN ON-CHAIN v1 - Request Exits
+### KILN ON-CHAIN v1 - Request Exits
 
 Function `requestValidatorsExit(bytes validatorPubkeys)`
 Clearsigned:
