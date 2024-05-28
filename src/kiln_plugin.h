@@ -87,7 +87,7 @@ typedef enum {
 // globals
 
 #define LR_STRATEGIES_COUNT                 11
-#define UNKNOWN_LR_ERC20                    255
+#define UNKNOWN_LR_ERC20                    15  // must be > LR_STRATEGIES_COUNT < 16
 #define UNKNOWN_LR_STRATEGY                 15  // must be > LR_STRATEGIES_COUNT < 16
 #define MAX_DISPLAYABLE_LR_STRATEGIES_COUNT (LR_STRATEGIES_COUNT * 3)
 #define ERC20_DECIMALS                      18
@@ -222,6 +222,7 @@ typedef struct {
     uint16_t relegations_count;
     uint8_t withdrawals_count;
     uint16_t strategies_count;
+    uint16_t tokens_count;
     // -- offset verification
     uint16_t tokens_offset;
     uint16_t middlewareTimesIndexes_offset;

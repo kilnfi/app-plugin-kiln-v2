@@ -870,7 +870,27 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
 
             break;
         }
-        case LRCQW_TOKENS__ITEM__ITEMS:
+        case LRCQW_TOKENS__ITEM__ITEMS: {
+            {
+                uint8_t buffer[ADDRESS_LENGTH];
+                copy_address(buffer, msg->parameter, sizeof(buffer));
+                char address_buffer[ADDRESS_STR_LEN];
+                getEthDisplayableAddress(buffer, address_buffer, sizeof(address_buffer), 0);
+
+                uint8_t token_index = find_lr_known_erc20(address_buffer);
+                // we check if the token matches the corresponding strategy
+                uint8_t strategy_index = params->strategies[params->tokens_count] & 0x0F;
+                if (strategy_index != UNKNOWN_LR_STRATEGY && token_index != strategy_index) {
+                    PRINTF("Token idx %d does not match strategy idx %d\n",
+                           token_index,
+                           strategy_index);
+                    msg->result = ETH_PLUGIN_RESULT_ERROR;
+                    return;
+                }
+
+                params->tokens_count += 1;
+            }
+
             params->current_item_count -= 1;
             if (params->current_item_count == 0) {
                 // we arrive at the end of the tokens array
@@ -884,6 +904,7 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
                 }
             }
             break;
+        }
 
         // ********************************************************************
         //  MIDDLEWARETIMESINDEXES[] PARSING
