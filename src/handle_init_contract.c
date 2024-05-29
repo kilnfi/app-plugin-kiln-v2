@@ -40,6 +40,13 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
     }
     context->selectorIndex = index;
 
+    // check for overflow
+    if ((size_t) context->selectorIndex != index) {
+        PRINTF("Error: overflow detected on selector index!\n");
+        msg->result = ETH_PLUGIN_RESULT_ERROR;
+        return;
+    }
+
     msg->result = ETH_PLUGIN_RESULT_OK;
 
     switch (context->selectorIndex) {
