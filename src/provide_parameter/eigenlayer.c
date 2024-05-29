@@ -713,7 +713,7 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
                 uint8_t strategy =
                     (strategy_index != UNKNOWN_LR_STRATEGY) ? strategy_index : UNKNOWN_LR_STRATEGY;
 
-                if (withdrawal > 16 || strategy > 16) {
+                if (withdrawal >= 16 || strategy >= 16) {
                     PRINTF("INVALID WITHDRAWAL #: %d STRATEGY #: %d\n", withdrawal, strategy);
                     msg->result = ETH_PLUGIN_RESULT_ERROR;
                     return;
