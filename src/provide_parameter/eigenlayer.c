@@ -637,7 +637,7 @@ void handle_lr_complete_queued_withdrawals(ethPluginProvideParameter_t *msg, con
                 uint8_t buffer[ADDRESS_LENGTH];
                 copy_address(buffer, msg->parameter, sizeof(buffer));
                 // we only support same withdrawer accross all the withdrawals
-                if (params->withdrawer[0] == '\0') {
+                if (allzeroes(params->withdrawer, sizeof(params->withdrawer)) == 1) {
                     memcpy(params->withdrawer, buffer, sizeof(params->withdrawer));
                 } else if (strcmp((const char *) params->withdrawer, (const char *) buffer) != 0) {
                     PRINTF("Unexpected withdrawer address, %s != expected %s\n",
