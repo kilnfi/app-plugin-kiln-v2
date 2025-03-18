@@ -54,3 +54,18 @@ jobs:
       additional_app_binaries_artifact: ethereum_build_develop
       additional_app_binaries_artifact_dir: ./tests/.test_dependencies/ethereum/build
       regenerate_snapshots: ${{ inputs.golden_run == 'Open a PR' }}
+
+  upload_test_snapshots:
+    name: Upload test snapshots
+    needs:
+      - ragger_tests_with_ethereum_develop
+    if: always()  # Run even if tests fail
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Upload test snapshots
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-snapshots
+          path: tests/snapshots-tmp/
+          retention-days: 1
