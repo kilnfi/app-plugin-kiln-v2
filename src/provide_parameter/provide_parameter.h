@@ -39,3 +39,5 @@ void handle_defi_redeem(ethPluginProvideParameter_t *msg, context_t *context);
 void handle_defi_approve(ethPluginProvideParameter_t *msg, context_t *context);
 void handle_defi_transfer(ethPluginProvideParameter_t *msg, context_t *context);
 void handle_defi_transfer_from(ethPluginProvideParameter_t *msg, context_t *context);
+
+void handle_morpho_claim(ethPluginProvideParameter_t *msg, context_t *context);

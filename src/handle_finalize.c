@@ -111,6 +111,11 @@ void handle_finalize(ethPluginFinalize_t *msg) {
             msg->result = ETH_PLUGIN_RESULT_OK;
             break;
 
+        case KILN_MORPHO_CLAIM:
+            msg->numScreens = 4;
+            msg->result = ETH_PLUGIN_RESULT_OK;
+            break;
+
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;

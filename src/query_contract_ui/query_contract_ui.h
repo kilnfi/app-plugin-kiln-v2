@@ -49,3 +49,6 @@ bool defi_redeem_ui(ethQueryContractUI_t *msg, context_t *context);
 bool defi_approve_ui(ethQueryContractUI_t *msg, context_t *context);
 bool defi_transfer_ui(ethQueryContractUI_t *msg, context_t *context);
 bool defi_transfer_from_ui(ethQueryContractUI_t *msg, context_t *context);
+
+// MORPHO UI
+bool morpho_claim_ui(ethQueryContractUI_t *msg, context_t *context);
