@@ -18,6 +18,7 @@ Smart contracts covered by the plugin:
 | Mainnet | DeFi    | Cool Wallet AAVEv3 USDT               | `0x03441c89e7B751bb570f9Dc8C92702b127c52C51` |
 | Mainnet | DeFi    | BITNOVO AAVE v3 USDC                  | `0x6f15CDA2D68B00311614294A2b9b17400636133C` |
 | Mainnet | DeFi    | Cool Wallet AAVEv3 USDT               | `0x4d1806C26A728f2e1b82b4549b9E074DBE5940B9` |
+| Mainnet | Morpho  | Morpho Rewards Distributor            | `0xfA1320d7Ac3f047bD958f5B92dFc07b9f316Dc6b` |
 
 ## Functions
 
@@ -49,3 +50,4 @@ For the smart contracts implemented, the functions covered by the plugin are:
 | DeFi     | approve                   | `0x095ea7b3` | <table><tbody> <tr><td><code>address spender</code></td></tr> <tr><td><code>uint256 amount</code></td></tr> </tbody></table>                                                                           |
 | DeFi     | transfer                  | `0xa9059cbb` | <table><tbody> <tr><td><code>address to</code></td></tr> <tr><td><code>uint256 amount</code></td></tr> </tbody></table>                                                                                |
 | DeFi     | transferFrom              | `0x23b872dd` | <table><tbody> <tr><td><code>address from</code></td></tr> <tr><td><code>address to</code></td></tr> <tr><td><code>uint256 amount</code></td></tr> </tbody></table>                                    |
+| Morpho   | claim                     | `0xfabed412` | <table><tbody> <tr><td><code>address rewardToken</code></td></tr> <tr><td><code>address account</code></td></tr> <tr><td><code>uint256 totalAmount</code></td></tr> </tbody></table>                |

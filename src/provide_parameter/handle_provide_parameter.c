@@ -89,6 +89,10 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
             handle_defi_transfer_from(msg, context);
             break;
 
+        case KILN_MORPHO_CLAIM:
+            handle_morpho_claim(msg, context);
+            break;
+
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;

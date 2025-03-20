@@ -107,6 +107,10 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
             ret = defi_transfer_from_ui(msg, context);
             break;
 
+        case KILN_MORPHO_CLAIM:
+            ret = morpho_claim_ui(msg, context);
+            break;
+
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             break;

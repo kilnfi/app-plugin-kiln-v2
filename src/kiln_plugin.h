@@ -65,7 +65,10 @@
 // --- 22. transfer(address,uint256)
 // --- 23. transferFrom(address,address,uint256)
 //
-#define NUM_SELECTORS 24
+// MORPHO
+// --- 24. claim(address,address,uint256,bytes32[])
+//
+#define NUM_SELECTORS 25
 extern const uint32_t KILN_SELECTORS[NUM_SELECTORS];
 
 // Selectors available (see mapping above).
@@ -94,6 +97,7 @@ typedef enum {
     KILN_DEFI_APPROVE,
     KILN_DEFI_TRANSFER,
     KILN_DEFI_TRANSFER_FROM,
+    KILN_MORPHO_CLAIM,
 } selector_t;
 
 // ****************************************************************************
@@ -357,6 +361,20 @@ typedef struct {
 } lr_complete_queued_withdrawals_t;
 
 // ****************************************************************************
+// * MORPHO
+// ****************************************************************************
+
+typedef enum {
+    MORPHO_CLAIM_UNEXPECTED_PARAMETER = 0,
+    MORPHO_CLAIM_REWARD_TOKEN,
+    MORPHO_CLAIM_ACCOUNT,
+    MORPHO_CLAIM_TOTAL_AMOUNT,
+    MORPHO_CLAIM_PROOF_OFFSET,
+    MORPHO_CLAIM_PROOF_LENGTH,
+    MORPHO_CLAIM_PROOF_ITEMS,
+} morpho_claim_parameters;
+
+// ****************************************************************************
 // * DEFI
 // ****************************************************************************
 
@@ -452,6 +470,13 @@ typedef struct {
     uint8_t vault_index;
 } defi_transfer_from_t;
 
+typedef struct {
+    char reward_token[ADDRESS_STR_LEN];
+    char account[ADDRESS_STR_LEN];
+    uint8_t total_amount[INT256_LENGTH];
+    uint16_t current_item_count;
+} morpho_claim_t;
+
 // ****************************************************************************
 // * SHARED PLUGIN CONTEXT MEMORY
 // ****************************************************************************
@@ -478,6 +503,8 @@ typedef struct context_t {
         defi_approve_t defi_approve;
         defi_transfer_t defi_transfer;
         defi_transfer_from_t defi_transfer_from;
+        
+        morpho_claim_t morpho_claim;
     } param_data;
 
     selector_t selectorIndex;

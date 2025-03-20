@@ -111,6 +111,10 @@ void handle_init_contract(ethPluginInitContract_t *msg) {
         case KILN_DEFI_TRANSFER_FROM:
             context->next_param = DEFI_TRANSFER_FROM_FROM;
             break;
+            
+        case KILN_MORPHO_CLAIM:
+            context->next_param = MORPHO_CLAIM_REWARD_TOKEN;
+            break;
 
         default:
             PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);
