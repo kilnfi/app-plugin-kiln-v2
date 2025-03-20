@@ -8,7 +8,7 @@
 ![Kiln Logo](https://uploads-ssl.webflow.com/625db3caa8abd6c22d5f0ce3/6260572336892a801afd71e3_Kiln_Logo-Transparent-Dark.svg)
 
 This plug-in is compatible with Nano S / X / SP devices, it enables to
-interact in a secure way with the Kiln On-Chain v1, v2, EigenLayer Liquid Restaking contracts, and DeFi vault contracts.
+interact in a secure way with the Kiln On-Chain v1, v2, EigenLayer Liquid Restaking contracts, DeFi vault contracts, and Morpho reward claiming.
 
 ## Documentation
 
@@ -93,6 +93,7 @@ Smart contracts covered by this plugin are:
 | Mainnet | Cool Wallet AAVEv3 USDT       | `0x03441c89e7B751bb570f9Dc8C92702b127c52C51` |
 | Mainnet | BITNOVO AAVE v3 USDC          | `0x6f15CDA2D68B00311614294A2b9b17400636133C` |
 | Mainnet | Cool Wallet AAVEv3 USDT       | `0x4d1806C26A728f2e1b82b4549b9E074DBE5940B9` |
+| Mainnet | Morpho Rewards Distributor    | `0xfA1320d7Ac3f047bD958f5B92dFc07b9f316Dc6b` |
 
 ## Clearsigning
 
@@ -377,3 +378,14 @@ Clearsigned:
 - amount: amount of tokens to transfer
 
 ![](/tests/snapshots/nanosp/test_defi_transfer_from/00000.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00001.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00002.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00003.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00004.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00005.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00006.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00007.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00008.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00009.png) ![](/tests/snapshots/nanosp/test_defi_transfer_from/00010.png)
+
+### Morpho - Claim
+
+Function: `claim(address rewardToken, address account, uint256 totalAmount, bytes32[] merkleProof)`
+Clearsigned:
+
+- rewardToken: address of the token being claimed (displayed as address)
+- account: address that will receive the rewards (displayed as address)
+- totalAmount: amount of tokens to claim (displayed as amount with MORPHO ticker)
+
+![](/tests/snapshots/stax/test_morpho_claim/00000.png) ![](/tests/snapshots/stax/test_morpho_claim/00001.png) ![](/tests/snapshots/stax/test_morpho_claim/00002.png) ![](/tests/snapshots/stax/test_morpho_claim/00003.png)

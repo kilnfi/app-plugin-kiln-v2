@@ -72,6 +72,10 @@ static const uint32_t KILN_DEFI_TRANSFER_SELECTOR = 0xa9059cbb;
 // -- cast sig "transferFrom(address,address,uint256)"
 static const uint32_t KILN_DEFI_TRANSFER_FROM_SELECTOR = 0x23b872dd;
 
+// MORPHO
+// --- cast sig "claim(address,address,uint256,bytes32[])"
+static const uint32_t KILN_MORPHO_CLAIM_SELECTOR = 0xfabed412;
+
 const char ocv2_exit_queues[OCV2_MAX_EXIT_QUEUES][ADDRESS_STR_LEN] = {
     "0x8d6Fd650500f82c7D978a440348e5a9b886943bF",  // Kiln
     "0x86358F7B33b599c484e0335B8Ee4f7f7f92d8b60"   // Coinbase
@@ -183,4 +187,6 @@ const uint32_t KILN_SELECTORS[NUM_SELECTORS] = {
     KILN_DEFI_APPROVE_SELECTOR,
     KILN_DEFI_TRANSFER_SELECTOR,
     KILN_DEFI_TRANSFER_FROM_SELECTOR,
+    // MORPHO
+    KILN_MORPHO_CLAIM_SELECTOR,
 };

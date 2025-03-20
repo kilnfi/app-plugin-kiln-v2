@@ -59,6 +59,10 @@ void handle_query_contract_id(ethQueryContractID_t *msg) {
             strlcpy(msg->version, "DeFi", msg->versionLength);
             break;
 
+        case KILN_MORPHO_CLAIM:
+            strlcpy(msg->version, "Morpho", msg->versionLength);
+            break;
+
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             msg->result = ETH_PLUGIN_RESULT_ERROR;
